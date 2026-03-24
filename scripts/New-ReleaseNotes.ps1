@@ -31,6 +31,7 @@ $releaseNotes = @"
 - **Version**: $Version
 - **SHA256**: ``$Sha256``
 - **MD5**: ``$Md5``
+- **Market manifest**: ``market-manifest.json``
 
 ## Installation
 

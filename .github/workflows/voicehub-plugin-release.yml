@@ -1,31 +1,21 @@
 name: VoiceHub Plugin Release
 
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       version:
         description: "Release version, for example 1.2.3"
         required: true
         type: string
-      target_ref:
-        description: "Git ref to release from"
-        required: false
-        default: "main"
-        type: string
 
 env:
   DOTNET_VERSION: "10.0.x"
-  MARKET_REPOSITORY: "wwiinnddyy/LanAirApp"
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
-  group: voicehub-plugin-release-${{ github.ref_name || github.event.inputs.version || github.run_id }}
+  group: voicehub-plugin-release-${{ github.event.inputs.version || github.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -35,22 +25,22 @@ jobs:
       version: ${{ steps.metadata.outputs.version }}
       release_tag: ${{ steps.metadata.outputs.release_tag }}
       asset_name: ${{ steps.metadata.outputs.asset_name }}
-      target_commitish: ${{ steps.metadata.outputs.target_commitish }}
+      target_commitish: ${{ steps.release_source.outputs.target_commitish }}
 
     steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: VoiceHubLanDesktop
+          ref: main
+
       - name: Checkout LanMountainDesktop
         uses: actions/checkout@v4
         with:
           repository: wwiinnddyy/LanMountainDesktop
           fetch-depth: 0
           path: LanMountainDesktop
-
-      - name: Checkout plugin
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: VoiceHubLanDesktop
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_ref || github.ref }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -72,36 +62,22 @@ jobs:
         id: release_plan
         shell: pwsh
         run: |
-          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
-            $version = "${{ github.event.inputs.version }}".Trim()
-            if ($version.StartsWith("v", [System.StringComparison]::OrdinalIgnoreCase)) {
-              $version = $version.Substring(1)
-            }
-            $releaseTag = "v$version"
-          }
-          else {
-            $releaseTag = "${{ github.ref_name }}"
-            $version = $releaseTag.Substring(1)
+          $version = "${{ github.event.inputs.version }}".Trim()
+          if ($version.StartsWith("v", [System.StringComparison]::OrdinalIgnoreCase)) {
+            $version = $version.Substring(1)
           }
 
+          $releaseTag = "v$version"
           "version=$version" >> $env:GITHUB_OUTPUT
           "release_tag=$releaseTag" >> $env:GITHUB_OUTPUT
 
-      - name: Apply release version
-        shell: pwsh
-        run: .\VoiceHubLanDesktop\scripts\Set-PluginVersion.ps1 -Version "${{ steps.release_plan.outputs.version }}" -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path
-
-      - name: Validate plugin metadata
-        shell: pwsh
-        run: .\VoiceHubLanDesktop\scripts\Test-PluginConsistency.ps1 -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path
-
-      - name: Prepare release source commit
+      - name: Update main with release version
         id: release_source
         shell: pwsh
         run: |
           $repoPath = (Resolve-Path ".\VoiceHubLanDesktop").Path
+          $version = "${{ steps.release_plan.outputs.version }}"
           $releaseTag = "${{ steps.release_plan.outputs.release_tag }}"
-          $eventName = "${{ github.event_name }}"
           $versionFiles = @(
             "VoiceHubLanDesktop.csproj",
             "plugin.json",
@@ -110,36 +86,19 @@ jobs:
 
           git -C $repoPath config user.name "github-actions[bot]"
           git -C $repoPath config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C $repoPath checkout -B main
 
-          $statusLines = git -C $repoPath status --porcelain -- $versionFiles
-          $hasVersionFileChanges = $statusLines.Count -gt 0
+          .\VoiceHubLanDesktop\scripts\Set-PluginVersion.ps1 -Version $version -RepositoryRoot $repoPath
 
-          if ($eventName -eq "workflow_dispatch") {
-            if ($hasVersionFileChanges) {
-              $sourceBranch = "automation/release-source-$releaseTag"
-              git -C $repoPath checkout -B $sourceBranch
-              git -C $repoPath add -- $versionFiles
-              git -C $repoPath commit -m "chore: prepare release $releaseTag"
-              git -C $repoPath push origin HEAD:refs/heads/$sourceBranch --force
-              $targetCommitish = (git -C $repoPath rev-parse HEAD).Trim()
-              $temporaryBranch = $sourceBranch
-            }
-            else {
-              $targetCommitish = (git -C $repoPath rev-parse HEAD).Trim()
-              $temporaryBranch = ""
-            }
-          }
-          else {
-            if ($hasVersionFileChanges) {
-              throw "Tag '$releaseTag' does not point to source files with matching plugin version metadata. Create the matching version commit first, or use workflow_dispatch to prepare the release version automatically."
-            }
-
-            $targetCommitish = (git -C $repoPath rev-parse HEAD).Trim()
-            $temporaryBranch = ""
+          $statusLines = @(git -C $repoPath status --porcelain -- $versionFiles)
+          if ($statusLines.Count -gt 0) {
+            git -C $repoPath add -- $versionFiles
+            git -C $repoPath commit -m "chore: prepare release $releaseTag"
           }
 
+          git -C $repoPath push origin HEAD:refs/heads/main
+          $targetCommitish = (git -C $repoPath rev-parse HEAD).Trim()
           "target_commitish=$targetCommitish" >> $env:GITHUB_OUTPUT
-          "temporary_branch=$temporaryBranch" >> $env:GITHUB_OUTPUT
 
       - name: Resolve build metadata
         id: metadata
@@ -151,11 +110,11 @@ jobs:
           if ($version -ne $requestedVersion) {
             throw "Plugin manifest version '$version' does not match requested release version '$requestedVersion'."
           }
+
           $assetName = "$($manifest.id).$version.laapp"
           "version=$version" >> $env:GITHUB_OUTPUT
           "release_tag=v$version" >> $env:GITHUB_OUTPUT
           "asset_name=$assetName" >> $env:GITHUB_OUTPUT
-          "target_commitish=${{ steps.release_source.outputs.target_commitish }}" >> $env:GITHUB_OUTPUT
 
       - name: Build plugin package
         shell: pwsh
@@ -165,7 +124,7 @@ jobs:
         shell: pwsh
         run: .\VoiceHubLanDesktop\scripts\Test-PluginConsistency.ps1 -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path -PackagePath ".\VoiceHubLanDesktop\${{ steps.metadata.outputs.asset_name }}"
 
-      - name: Generate release metadata
+      - name: Generate release notes
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .\VoiceHubLanDesktop\artifacts | Out-Null
@@ -182,11 +141,20 @@ jobs:
             -Sha256 $sha256 `
             -OutputPath .\VoiceHubLanDesktop\artifacts\release-notes.md
 
+      - name: Create or update tag
+        shell: pwsh
+        run: |
+          $repoPath = (Resolve-Path ".\VoiceHubLanDesktop").Path
+          $releaseTag = "${{ steps.metadata.outputs.release_tag }}"
+          $targetCommitish = "${{ steps.release_source.outputs.target_commitish }}"
+          git -C $repoPath tag -f $releaseTag $targetCommitish
+          git -C $repoPath push origin refs/tags/$releaseTag --force
+
       - name: Create or update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.metadata.outputs.release_tag }}
-          target_commitish: ${{ steps.metadata.outputs.target_commitish }}
+          target_commitish: ${{ steps.release_source.outputs.target_commitish }}
           name: ${{ steps.metadata.outputs.release_tag }}
           body_path: VoiceHubLanDesktop/artifacts/release-notes.md
           files: |
@@ -246,323 +214,28 @@ jobs:
           Set-Content -Path .\VoiceHubLanDesktop\artifacts\sha256.txt -Value $actualHash -Encoding utf8NoBOM
           Set-Content -Path .\VoiceHubLanDesktop\artifacts\md5.txt -Value $actualMd5 -Encoding utf8NoBOM
 
-      - name: Generate verified AirApp Market sync metadata
+      - name: Generate market manifest from verified package
         shell: pwsh
         run: |
-          $verifiedPackagePath = Resolve-Path ".\VoiceHubLanDesktop\artifacts\verified\${{ steps.metadata.outputs.asset_name }}"
-          .\VoiceHubLanDesktop\scripts\New-AirAppMarketSync.ps1 `
+          $verifiedPackagePath = (Join-Path (Resolve-Path ".\VoiceHubLanDesktop\artifacts\verified").Path "${{ steps.metadata.outputs.asset_name }}")
+          .\VoiceHubLanDesktop\scripts\New-MarketManifest.ps1 `
             -TemplatePath .\VoiceHubLanDesktop\airappmarket-entry.template.json `
             -PackagePath $verifiedPackagePath `
             -Version "${{ steps.metadata.outputs.version }}" `
-            -OutputPath .\VoiceHubLanDesktop\artifacts\airappmarket-sync.json
+            -ReleaseTag "${{ steps.metadata.outputs.release_tag }}" `
+            -OutputPath .\VoiceHubLanDesktop\artifacts\market-manifest.json
 
-      - name: Upload verified release artifacts
-        uses: actions/upload-artifact@v4
+      - name: Publish verified market manifest
+        uses: softprops/action-gh-release@v2
         with:
-          name: voicehub-plugin-release
-          path: |
-            VoiceHubLanDesktop/artifacts/verified/${{ steps.metadata.outputs.asset_name }}
-            VoiceHubLanDesktop/artifacts/sha256.txt
-            VoiceHubLanDesktop/artifacts/md5.txt
-            VoiceHubLanDesktop/artifacts/release-notes.md
-            VoiceHubLanDesktop/artifacts/airappmarket-sync.json
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Delete temporary release source branch
-        if: always() && steps.release_source.outputs.temporary_branch != ''
-        shell: pwsh
-        run: git -C .\VoiceHubLanDesktop push origin --delete "${{ steps.release_source.outputs.temporary_branch }}"
-
-  sync-root-fallback-pr:
-    needs: release
-    runs-on: windows-latest
-    continue-on-error: true
-    env:
-      ROOT_SYNC_TOKEN: ${{ secrets.VOICEHUB_PLUGIN_PR_TOKEN != '' && secrets.VOICEHUB_PLUGIN_PR_TOKEN || secrets.GITHUB_TOKEN }}
-
-    steps:
-      - name: Checkout plugin
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: VoiceHubLanDesktop
-          ref: main
-
-      - name: Download release artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: voicehub-plugin-release
-          path: downloaded
-
-      - name: Sync repository root fallback package
-        shell: pwsh
-        run: |
-          .\VoiceHubLanDesktop\scripts\Set-PluginVersion.ps1 -Version "${{ needs.release.outputs.version }}" -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path
-          Get-ChildItem .\VoiceHubLanDesktop -Filter "*.laapp" -File | Remove-Item -Force
-          $package = Get-ChildItem .\downloaded -Recurse -Filter "*.laapp" | Select-Object -First 1
-          if (-not $package) {
-            throw "Release package artifact not found."
-          }
-          Copy-Item $package.FullName (Join-Path (Resolve-Path ".\VoiceHubLanDesktop").Path $package.Name) -Force
-
-      - name: Create root fallback PR
-        id: root_fallback_pr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ env.ROOT_SYNC_TOKEN }}
-          path: VoiceHubLanDesktop
-          branch: automation/root-fallback-${{ needs.release.outputs.release_tag }}
-          delete-branch: true
-          commit-message: "chore: sync root fallback package ${{ needs.release.outputs.release_tag }}"
-          title: "chore: sync root fallback package ${{ needs.release.outputs.release_tag }}"
-          body: |
-            Sync the repository-root fallback package and version files after releasing `${{ needs.release.outputs.release_tag }}`.
-          add-paths: |
-            *.laapp
-            VoiceHubLanDesktop.csproj
-            plugin.json
-            README.md
-
-      - name: Merge root fallback PR
-        if: steps.root_fallback_pr.outputs.pull-request-number != ''
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ env.ROOT_SYNC_TOKEN }}
-          script: |
-            const pullNumber = Number("${{ steps.root_fallback_pr.outputs.pull-request-number }}");
-            const { owner, repo } = context.repo;
-
-            const pull = await github.rest.pulls.get({
-              owner,
-              repo,
-              pull_number: pullNumber
-            });
-
-            if (pull.data.state !== "open") {
-              throw new Error(`Root fallback PR #${pullNumber} is not open.`);
-            }
-
-            await github.rest.pulls.merge({
-              owner,
-              repo,
-              pull_number: pullNumber,
-              merge_method: "squash"
-            });
-
-      - name: Verify root fallback sync result
-        if: steps.root_fallback_pr.outputs.pull-request-number == ''
-        shell: pwsh
-        run: |
-          if ("${{ steps.root_fallback_pr.outputs.pull-request-operation }}" -ne "none") {
-            throw "Root fallback sync did not produce a PR and was not reported as already up to date."
-          }
-          Write-Host "Root fallback files already match the released version."
-
-  sync-airappmarket-pr:
-    needs: release
-    runs-on: windows-latest
-    continue-on-error: true
-    env:
-      LANAIRAPP_INDEX_TOKEN: ${{ secrets.LANAIRAPP_INDEX_TOKEN }}
-
-    steps:
-      - name: Check AirApp sync token
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN == '' }}
-        shell: pwsh
-        run: Write-Warning "LANAIRAPP_INDEX_TOKEN is not available, so AirApp Market sync is being skipped."
-
-      - name: Checkout plugin
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: VoiceHubLanDesktop
-
-      - name: Checkout LanAirApp
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.MARKET_REPOSITORY }}
-          fetch-depth: 0
-          path: LanAirApp
-          token: ${{ env.LANAIRAPP_INDEX_TOKEN }}
-          ref: main
-
-      - name: Download release artifacts
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: voicehub-plugin-release
-          path: downloaded
-
-      - name: Setup .NET
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Update AirApp Market index
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        shell: pwsh
-        run: |
-          $syncFile = Get-ChildItem .\downloaded -Recurse -Filter "airappmarket-sync.json" | Select-Object -First 1
-          if (-not $syncFile) {
-            throw "airappmarket-sync.json artifact not found."
-          }
-          .\VoiceHubLanDesktop\scripts\Update-LanAirAppIndex.ps1 `
-            -IndexPath .\LanAirApp\airappmarket\index.json `
-            -SyncEntryPath $syncFile.FullName
-
-      - name: Validate AirApp Market index
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        shell: pwsh
-        run: dotnet run --project .\LanAirApp\airappmarket\tools\AirAppMarket.Validator -- .\LanAirApp\airappmarket\index.json .\LanAirApp\airappmarket\schema\airappmarket-index.schema.json
-
-      - name: Create AirApp Market sync PR
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        id: airappmarket_pr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ env.LANAIRAPP_INDEX_TOKEN }}
-          path: LanAirApp
-          branch: automation/airappmarket-${{ needs.release.outputs.release_tag }}
-          delete-branch: true
-          commit-message: "chore: sync market entry ${{ needs.release.outputs.release_tag }}"
-          title: "chore: sync market entry ${{ needs.release.outputs.release_tag }}"
-          body: |
-            Sync the official AirApp Market index for `${{ needs.release.outputs.release_tag }}`.
-          add-paths: |
-            airappmarket/index.json
-
-      - name: Merge AirApp Market sync PR
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' && steps.airappmarket_pr.outputs.pull-request-number != '' }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ env.LANAIRAPP_INDEX_TOKEN }}
-          script: |
-            const pullNumber = Number("${{ steps.airappmarket_pr.outputs.pull-request-number }}");
-            const owner = "wwiinnddyy";
-            const repo = "LanAirApp";
-
-            const pull = await github.rest.pulls.get({
-              owner,
-              repo,
-              pull_number: pullNumber
-            });
-
-            if (pull.data.state !== "open") {
-              throw new Error(`AirApp Market sync PR #${pullNumber} is not open.`);
-            }
-
-            await github.rest.pulls.merge({
-              owner,
-              repo,
-              pull_number: pullNumber,
-              merge_method: "squash"
-            });
-
-      - name: Verify AirApp sync result
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' && steps.airappmarket_pr.outputs.pull-request-number == '' }}
-        shell: pwsh
-        run: |
-          if ("${{ steps.airappmarket_pr.outputs.pull-request-operation }}" -ne "none") {
-            throw "AirApp Market sync did not produce a PR and was not reported as already up to date."
-          }
-          Write-Host "LanAirApp market index already matches the released version."
-
-  close-stale-sync-prs:
-    needs:
-      - release
-      - sync-root-fallback-pr
-      - sync-airappmarket-pr
-    runs-on: windows-latest
-    continue-on-error: true
-    if: ${{ always() && needs.release.result == 'success' }}
-    env:
-      ROOT_SYNC_TOKEN: ${{ secrets.VOICEHUB_PLUGIN_PR_TOKEN != '' && secrets.VOICEHUB_PLUGIN_PR_TOKEN || secrets.GITHUB_TOKEN }}
-      LANAIRAPP_INDEX_TOKEN: ${{ secrets.LANAIRAPP_INDEX_TOKEN }}
-
-    steps:
-      - name: Close stale root fallback PRs
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ env.ROOT_SYNC_TOKEN }}
-          script: |
-            const currentRef = `automation/root-fallback-${{ needs.release.outputs.release_tag }}`;
-            const { owner, repo } = context.repo;
-            const pulls = await github.paginate(github.rest.pulls.list, {
-              owner,
-              repo,
-              state: "open",
-              per_page: 100
-            });
-
-            for (const pull of pulls) {
-              if (!pull.head.ref.startsWith("automation/root-fallback-v") || pull.head.ref === currentRef) {
-                continue;
-              }
-
-              await github.rest.pulls.update({
-                owner,
-                repo,
-                pull_number: pull.number,
-                state: "closed"
-              });
-
-              try {
-                await github.rest.git.deleteRef({
-                  owner,
-                  repo,
-                  ref: `heads/${pull.head.ref}`
-                });
-              }
-              catch (error) {
-                core.warning(`Failed to delete stale root fallback branch '${pull.head.ref}': ${error.message}`);
-              }
-            }
-
-      - name: Warn when AirApp cleanup is skipped
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN == '' }}
-        shell: pwsh
-        run: Write-Warning "LANAIRAPP_INDEX_TOKEN is not available, so stale AirApp Market sync PR cleanup is being skipped."
-
-      - name: Close stale AirApp Market sync PRs
-        if: ${{ env.LANAIRAPP_INDEX_TOKEN != '' }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ env.LANAIRAPP_INDEX_TOKEN }}
-          script: |
-            const currentRef = `automation/airappmarket-${{ needs.release.outputs.release_tag }}`;
-            const owner = "wwiinnddyy";
-            const repo = "LanAirApp";
-            const pulls = await github.paginate(github.rest.pulls.list, {
-              owner,
-              repo,
-              state: "open",
-              per_page: 100
-            });
-
-            for (const pull of pulls) {
-              if (!pull.head.ref.startsWith("automation/airappmarket-v") || pull.head.ref === currentRef) {
-                continue;
-              }
-
-              await github.rest.pulls.update({
-                owner,
-                repo,
-                pull_number: pull.number,
-                state: "closed"
-              });
-
-              try {
-                await github.rest.git.deleteRef({
-                  owner,
-                  repo,
-                  ref: `heads/${pull.head.ref}`
-                });
-              }
-              catch (error) {
-                core.warning(`Failed to delete stale AirApp Market branch '${pull.head.ref}': ${error.message}`);
-              }
-            }
+          tag_name: ${{ steps.metadata.outputs.release_tag }}
+          target_commitish: ${{ steps.release_source.outputs.target_commitish }}
+          files: |
+            VoiceHubLanDesktop/artifacts/market-manifest.json
+          fail_on_unmatched_files: true
+          overwrite_files: true
+          draft: false
+          prerelease: false
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

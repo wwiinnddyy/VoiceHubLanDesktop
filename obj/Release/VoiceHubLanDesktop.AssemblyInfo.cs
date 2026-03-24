@@ -12,11 +12,11 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("VoiceHubLanDesktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("0.0.1.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.0.1+839878fc27d6671ff3cc1c05f225bf402d1a021b")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("0.0.3.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.0.3+b4091b97fbbe6ac050278af898925053e416365c")]
 [assembly: System.Reflection.AssemblyProductAttribute("VoiceHubLanDesktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VoiceHubLanDesktop")]
-[assembly: System.Reflection.AssemblyVersionAttribute("0.0.1.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("0.0.3.0")]
 
 // 由 MSBuild WriteCodeFragment 类生成。
 

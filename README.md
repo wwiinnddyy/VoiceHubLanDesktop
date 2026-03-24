@@ -1,98 +1,105 @@
 # VoiceHubLanDesktop
 
-声动校园歌单 - LanMountainDesktop 桌面插件
+LanMountainDesktop plugin for showing the VoiceHub campus radio playlist.
 
-## 功能特性
+## Features
 
-- 展示VoiceHub广播站当日排期歌曲
-- 按播放顺序显示歌曲信息（序号、歌手-歌名、点歌人、投票数）
-- 支持自定义API地址
-- 支持自定义刷新间隔（1-1440分钟）
-- 支持显示/隐藏点歌人
-- 支持自定义最大显示数量（1-50首）
-- 支持中英文本地化
-- 等比例缩放（最小3×4格子）
+- Show the current VoiceHub public schedule
+- Display songs in play order
+- Support custom API URL
+- Support configurable refresh interval
+- Support showing or hiding requesters
+- Support configurable max item count
+- Support localization
+- Auto-scale for small widget sizes
 
-## 安装方式
+## Install
 
-### 从Release安装
+Download the latest `.laapp` from [Releases](https://github.com/wwiinnddyy/VoiceHubLanDesktop/releases) and install it in LanMountainDesktop. Official releases also include `market-manifest.json` for the market aggregator.
 
-从 [Releases](https://github.com/wwiinnddyy/VoiceHubLanDesktop/releases) 页面下载最新的 `.laapp` 文件，然后在 LanMountainDesktop 中安装插件。
+## Release Info
 
-### 手动安装
+<!-- voicehub-release-info:start -->
+- Current version: 0.0.3
+- Current release tag: v0.0.3
+- Current root package: VoiceHubLanDesktop.0.0.3.laapp
+- Published assets: .laapp, market-manifest.json, sha256.txt, md5.txt
+<!-- voicehub-release-info:end -->
 
-1. 下载最新的 `.laapp` 文件
-2. 将文件复制到 LanMountainDesktop 的插件目录
+## Manual Install
 
-## 开发构建
+1. Download the latest `.laapp`
+2. Copy it into the LanMountainDesktop plugin folder
 
-### 环境要求
+## Build
+
+### Requirements
 
 - .NET 10.0 SDK
 - LanMountainDesktop.PluginSdk 4.0.0
 
-### 本地开发
+### Local build
 
 ```powershell
-# 初始化本地包源
+# Initialize the local package feed
 .\scripts\Initialize-LocalPackageFeed.ps1
 
-# 构建项目
+# Build the project
 dotnet build -c Release
 ```
 
-### 运行测试
+### Validation
 
 ```powershell
-# 验证插件一致性
+# Validate plugin consistency
 .\scripts\Test-PluginConsistency.ps1
 ```
 
-## 配置说明
+## Configuration
 
-在 LanMountainDesktop 设置中找到"声动校园设置"页面：
+Find the "VoiceHub settings" page in LanMountainDesktop:
 
-| 设置项 | 说明 | 默认值 |
-|--------|------|--------|
-| API地址 | VoiceHub广播站API地址 | https://voicehub.lao-shui.top/api/songs/public |
-| 刷新间隔 | 自动刷新间隔（分钟） | 60 |
-| 显示点歌人 | 是否显示点歌人名称 | 是 |
-| 最大显示数量 | 最多显示歌曲数量 | 10 |
+| Setting | Description | Default |
+|---------|-------------|---------|
+| API URL | VoiceHub public API endpoint | https://voicehub.lao-shui.top/api/songs/public |
+| Refresh interval | Auto refresh interval in minutes | 60 |
+| Show requester | Whether to show requesters | Yes |
+| Max items | Maximum number of songs to show | 10 |
 
-## 项目结构
+## Project Layout
 
-```
+```text
 VoiceHubLanDesktop/
 ├── .github/
 │   └── workflows/
-│       ├── voicehub-plugin-ci.yml        # CI工作流
-│       └── voicehub-plugin-release.yml   # 发布工作流
+│       ├── voicehub-plugin-ci.yml
+│       └── voicehub-plugin-release.yml
 ├── Localization/
-│   ├── zh-CN.json                       # 中文本地化
-│   └── en-US.json                       # 英文本地化
+│   ├── zh-CN.json
+│   └── en-US.json
 ├── Models/
-│   └── VoiceHubModels.cs                # 数据模型
+│   └── VoiceHubModels.cs
 ├── Services/
-│   └── VoiceHubSettingsService.cs       # 设置服务
+│   └── VoiceHubSettingsService.cs
 ├── Widgets/
-│   └── VoiceHubPlaylistWidget.cs        # 桌面组件
+│   └── VoiceHubPlaylistWidget.cs
 ├── scripts/
-│   ├── Initialize-LocalPackageFeed.ps1  # 初始化本地包源
-│   ├── New-AirAppMarketSync.ps1         # 生成市场同步数据
-│   ├── New-ReleaseNotes.ps1             # 生成发布说明
-│   ├── Set-PluginVersion.ps1            # 设置插件版本
-│   └── Test-PluginConsistency.ps1       # 测试插件一致性
-├── airappmarket-entry.template.json     # 市场条目模板
-├── NuGet.config                         # NuGet配置
-├── Plugin.cs                            # 插件入口
-├── plugin.json                          # 插件清单
-└── VoiceHubLanDesktop.csproj            # 项目文件
+│   ├── Initialize-LocalPackageFeed.ps1
+│   ├── New-MarketManifest.ps1
+│   ├── New-ReleaseNotes.ps1
+│   ├── Set-PluginVersion.ps1
+│   └── Test-PluginConsistency.ps1
+├── airappmarket-entry.template.json
+├── NuGet.config
+├── Plugin.cs
+├── plugin.json
+└── VoiceHubLanDesktop.csproj
 ```
 
-## 许可证
+## License
 
 MIT License
 
-## 作者
+## Author
 
 LaoShui

@@ -1,9 +1,12 @@
 {
     "id":  "VoiceHubLanDesktop",
-    "name":  "声动校园歌单",
-    "description":  "展示 VoiceHub 广播站当日歌单，按播放顺序显示歌曲信息。",
+    "name":  "VoiceHub Campus Playlist",
+    "description":  "Shows the VoiceHub public playlist in LanMountainDesktop.",
     "author":  "LaoShui",
-    "version":  "0.0.1",
+    "version":  "0.0.3",
     "apiVersion":  "4.0.0",
-    "entranceAssembly":  "VoiceHubLanDesktop.dll"
+    "entranceAssembly":  "VoiceHubLanDesktop.dll",
+    "sharedContracts":  [
+
+                        ]
 }

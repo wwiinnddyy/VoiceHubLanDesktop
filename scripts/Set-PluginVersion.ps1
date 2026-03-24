@@ -40,26 +40,27 @@ Write-Host "Updated plugin.json version to $normalizedVersion"
 
 if (Test-Path $readmePath) {
     $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
-    $readmeLines = [System.IO.File]::ReadAllLines($readmePath, [System.Text.Encoding]::UTF8)
-    $updatedReadmeLines = foreach ($line in $readmeLines) {
-        if ($line -match '^(?<prefix>\s*-\s*(?:当前版本|Current version)：?\s*)`[^`]+`(?<suffix>.*)$') {
-            $Matches.prefix + '`' + $normalizedVersion + '`' + $Matches.suffix
-            continue
-        }
-
-        if ($line -match '^(?<prefix>\s*-\s*(?:当前 Release 标签|Current release tag)：?\s*)`[^`]+`(?<suffix>.*)$') {
-            $Matches.prefix + '`' + "v$normalizedVersion" + '`' + $Matches.suffix
-            continue
-        }
-
-        if ($line -match '^(?<prefix>\s*-\s*(?:当前根目录包名|Current root package)：?\s*)`[^`]+`(?<suffix>.*)$') {
-            $Matches.prefix + '`' + "VoiceHubLanDesktop.$normalizedVersion.laapp" + '`' + $Matches.suffix
-            continue
-        }
-
-        $line
+    $readme = [System.IO.File]::ReadAllText($readmePath, [System.Text.Encoding]::UTF8)
+    $releaseInfoPattern = '(?s)<!-- voicehub-release-info:start -->.*?<!-- voicehub-release-info:end -->'
+    if (-not [System.Text.RegularExpressions.Regex]::IsMatch($readme, $releaseInfoPattern)) {
+        throw "README.md does not contain the voicehub release info marker block."
     }
 
-    [System.IO.File]::WriteAllLines($readmePath, $updatedReadmeLines, $utf8NoBom)
+    $releaseInfoBlock = @(
+        '<!-- voicehub-release-info:start -->'
+        "- Current version: $normalizedVersion"
+        "- Current release tag: v$normalizedVersion"
+        "- Current root package: VoiceHubLanDesktop.$normalizedVersion.laapp"
+        '- Published assets: .laapp, market-manifest.json, sha256.txt, md5.txt'
+        '<!-- voicehub-release-info:end -->'
+    ) -join [Environment]::NewLine
+
+    $updatedReadme = [System.Text.RegularExpressions.Regex]::Replace(
+        $readme,
+        $releaseInfoPattern,
+        $releaseInfoBlock,
+        [System.Text.RegularExpressions.RegexOptions]::Singleline)
+
+    [System.IO.File]::WriteAllText($readmePath, $updatedReadme, $utf8NoBom)
     Write-Host "Updated README.md version to $normalizedVersion"
 }

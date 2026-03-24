@@ -1,17 +1,6 @@
 {
-  "id": "VoiceHubLanDesktop",
-  "name": "声动校园歌单",
-  "description": "展示 VoiceHub 广播站当日歌单，按播放顺序显示歌曲信息。",
-  "author": "LaoShui",
-  "version": "",
-  "apiVersion": "4.0.0",
   "minHostVersion": "0.7.4",
-  "downloadUrl": "",
-  "sha256": "",
-  "packageSizeBytes": 0,
   "iconUrl": "https://raw.githubusercontent.com/wwiinnddyy/VoiceHubLanDesktop/main/Assets/icon.png",
-  "releaseTag": "",
-  "releaseAssetName": "",
   "projectUrl": "https://github.com/wwiinnddyy/VoiceHubLanDesktop",
   "readmeUrl": "https://raw.githubusercontent.com/wwiinnddyy/VoiceHubLanDesktop/main/README.md",
   "homepageUrl": "https://github.com/wwiinnddyy/VoiceHubLanDesktop",
@@ -22,7 +11,5 @@
     "playlist",
     "radio"
   ],
-  "publishedAt": "",
-  "updatedAt": "",
-  "releaseNotes": "展示 VoiceHub 广播站当日歌单，支持自定义 API 地址、刷新间隔、显示设置等。支持中英文本地化。"
+  "releaseNotes": "VoiceHub playlist widget for LanMountainDesktop. Supports custom API URL, refresh interval, requester visibility, and max item count."
 }
