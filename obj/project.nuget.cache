@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kUhMUbHe9Jg=",
+  "dgSpecHash": "MWU/19JF/uk=",
   "success": true,
-  "projectFilePath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+  "projectFilePath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\USER154971\\.nuget\\packages\\avalonia\\11.3.12\\avalonia.11.3.12.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\avalonia.buildservices\\11.3.2\\avalonia.buildservices.11.3.2.nupkg.sha512",

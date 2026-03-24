@@ -1,0 +1,33 @@
+# User and IDE files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+.vs/
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# .NET and Avalonia build outputs
+/bin/
+/obj/
+*.binlog
+
+# Workflow-generated release metadata
+/artifacts/*
+
+# Local NuGet packages
+/packages/*
+
+# Local temp and logs
+.env
+*.log
+*.tmp
+*.cache
+Thumbs.db
+.DS_Store

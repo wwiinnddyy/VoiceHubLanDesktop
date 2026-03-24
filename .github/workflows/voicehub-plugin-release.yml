@@ -38,6 +38,13 @@ jobs:
       target_commitish: ${{ steps.metadata.outputs.target_commitish }}
 
     steps:
+      - name: Checkout LanMountainDesktop
+        uses: actions/checkout@v4
+        with:
+          repository: wwiinnddyy/LanMountainDesktop
+          fetch-depth: 0
+          path: LanMountainDesktop
+
       - name: Checkout plugin
         uses: actions/checkout@v4
         with:
@@ -49,6 +56,17 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Initialize local package feed
+        shell: pwsh
+        run: |
+          $feedPath = Join-Path (Resolve-Path ".\VoiceHubLanDesktop").Path "packages"
+          $sdkProject = Join-Path (Resolve-Path ".\LanMountainDesktop\LanMountainDesktop.PluginSdk").Path "LanMountainDesktop.PluginSdk.csproj"
+          $contractsProject = Join-Path (Resolve-Path ".\LanMountainDesktop\LanMountainDesktop.Shared.Contracts").Path "LanMountainDesktop.Shared.Contracts.csproj"
+          .\VoiceHubLanDesktop\scripts\Initialize-LocalPackageFeed.ps1 `
+            -FeedPath $feedPath `
+            -PluginSdkProjectPath $sdkProject `
+            -CoreContractsProjectPath $contractsProject
 
       - name: Resolve requested release version
         id: release_plan
