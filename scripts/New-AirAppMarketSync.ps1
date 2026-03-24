@@ -24,6 +24,23 @@ function Write-Utf8File([string]$Path, [string]$Content) {
     [System.IO.File]::WriteAllText($Path, $Content, $encoding)
 }
 
+function Get-RepositoryInfo([string]$RepositoryUrl) {
+    $uri = [Uri]$RepositoryUrl
+    if ($uri.Host -ne "github.com") {
+        throw "Unsupported repository host in '$RepositoryUrl'."
+    }
+
+    $segments = $uri.AbsolutePath.Trim("/") -split "/"
+    if ($segments.Length -ne 2) {
+        throw "Repository URL '$RepositoryUrl' must point to the GitHub repository root."
+    }
+
+    return @{
+        Owner = $segments[0]
+        Name = $segments[1]
+    }
+}
+
 function Get-PropertyValue($Object, [string]$Name) {
     if ($null -eq $Object) {
         return $null
@@ -52,35 +69,37 @@ $assetName = [System.IO.Path]::GetFileName($resolvedPackagePath)
 $hash = (Get-FileHash -Path $resolvedPackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
 $packageSize = (Get-Item $resolvedPackagePath).Length
 
-$archive = [System.IO.Compression.ZipFile]::OpenRead($resolvedPackagePath)
-try {
-    $manifestEntry = $archive.Entries | Where-Object { $_.FullName -eq "plugin.json" } | Select-Object -First 1
-    if ($null -eq $manifestEntry) {
-        throw "Plugin package '$resolvedPackagePath' does not contain 'plugin.json'."
-    }
-
-    $stream = $null
-    $reader = $null
+function Get-PackageManifest([string]$ArchivePath) {
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($ArchivePath)
     try {
-        $stream = $manifestEntry.Open()
-        $reader = [System.IO.StreamReader]::new($stream)
-        $manifestJson = $reader.ReadToEnd()
+        $manifestEntry = $archive.Entries | Where-Object { $_.FullName -eq "plugin.json" } | Select-Object -First 1
+        if ($null -eq $manifestEntry) {
+            throw "Plugin package '$ArchivePath' does not contain 'plugin.json'."
+        }
+
+        $stream = $null
+        $reader = $null
+        try {
+            $stream = $manifestEntry.Open()
+            $reader = [System.IO.StreamReader]::new($stream, [System.Text.UTF8Encoding]::UTF8, $true)
+            return $reader.ReadToEnd() | ConvertFrom-Json
+        }
+        finally {
+            if ($reader) {
+                $reader.Dispose()
+            }
+
+            if ($stream) {
+                $stream.Dispose()
+            }
+        }
     }
     finally {
-        if ($reader) {
-            $reader.Dispose()
-        }
-
-        if ($stream) {
-            $stream.Dispose()
-        }
+        $archive.Dispose()
     }
 }
-finally {
-    $archive.Dispose()
-}
 
-$manifest = $manifestJson | ConvertFrom-Json
+$manifest = Get-PackageManifest -ArchivePath $resolvedPackagePath
 $manifestVersion = [string](Get-PropertyValue $manifest "version")
 if ([string]::IsNullOrWhiteSpace($manifestVersion)) {
     throw "Plugin manifest inside '$resolvedPackagePath' is missing 'version'."
@@ -89,6 +108,18 @@ if ([string]::IsNullOrWhiteSpace($manifestVersion)) {
 if ($manifestVersion -ne $Version) {
     throw "Requested version '$Version' does not match package manifest version '$manifestVersion'."
 }
+
+$repositoryUrl = [string](Get-PropertyValue $template "repositoryUrl")
+if ([string]::IsNullOrWhiteSpace($repositoryUrl)) {
+    $repositoryUrl = [string](Get-PropertyValue $template "projectUrl")
+}
+
+if ([string]::IsNullOrWhiteSpace($repositoryUrl)) {
+    throw "Template is missing repositoryUrl/projectUrl."
+}
+
+$repo = Get-RepositoryInfo -RepositoryUrl $repositoryUrl
+$downloadUrl = "https://raw.githubusercontent.com/$($repo.Owner)/$($repo.Name)/main/$assetName"
 
 $sharedContracts = @(
     Get-ArrayValue -Object $manifest -Name "sharedContracts" |
@@ -118,7 +149,7 @@ $entry = [pscustomobject][ordered]@{
     apiVersion = [string](Get-PropertyValue $manifest "apiVersion")
     sharedContracts = $sharedContracts
     minHostVersion = [string](Get-PropertyValue $template "minHostVersion")
-    downloadUrl = ""
+    downloadUrl = $downloadUrl
     sha256 = $hash
     packageSizeBytes = $packageSize
     iconUrl = [string](Get-PropertyValue $template "iconUrl")

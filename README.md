@@ -17,7 +17,7 @@
 
 ### 从Release安装
 
-从 [Releases](https://github.com/laoshuikaixue/VoiceHubLanDesktop/releases) 页面下载最新的 `.laapp` 文件，然后在 LanMountainDesktop 中安装插件。
+从 [Releases](https://github.com/wwiinnddyy/VoiceHubLanDesktop/releases) 页面下载最新的 `.laapp` 文件，然后在 LanMountainDesktop 中安装插件。
 
 ### 手动安装
 
