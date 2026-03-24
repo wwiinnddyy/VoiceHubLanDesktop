@@ -1,0 +1,9 @@
+{
+  "id": "VoiceHubLanDesktop",
+  "name": "声动校园歌单",
+  "description": "展示VoiceHub广播站当日排期歌曲，按播放顺序显示歌曲信息。",
+  "author": "LaoShui",
+  "version": "1.0.0",
+  "apiVersion": "4.0.0",
+  "entranceAssembly": "VoiceHubLanDesktop.dll"
+}

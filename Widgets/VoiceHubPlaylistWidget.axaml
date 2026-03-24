@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:VoiceHubLanDesktop.Widgets"
+             x:Class="VoiceHubLanDesktop.Widgets.VoiceHubPlaylistWidget"
+             x:Name="Root">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Border x:Name="HeaderHost"
+                Grid.Row="0"
+                Background="#1F000000"
+                Padding="12,8">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock x:Name="HeaderText"
+                           Grid.Column="0"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           VerticalAlignment="Center" />
+                <TextBlock x:Name="DateText"
+                           Grid.Column="1"
+                           Foreground="#FFBFE9FF"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right" />
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Row="1">
+            <!-- Songs List -->
+            <ScrollViewer x:Name="SongsScrollViewer"
+                          Padding="8,4"
+                          VerticalScrollBarVisibility="Hidden">
+                <StackPanel x:Name="SongsPanel"
+                            Spacing="4" />
+            </ScrollViewer>
+
+            <!-- Loading State -->
+            <Border x:Name="LoadingHost"
+                    Background="#14000000"
+                    IsVisible="False">
+                <TextBlock x:Name="LoadingText"
+                           Foreground="#FFBFE9FF"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+
+            <!-- Error State -->
+            <Border x:Name="ErrorHost"
+                    Background="#1F7C2D12"
+                    BorderBrush="#66F87171"
+                    BorderThickness="1"
+                    IsVisible="False">
+                <TextBlock x:Name="ErrorText"
+                           Foreground="#FFF87171"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center" />
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

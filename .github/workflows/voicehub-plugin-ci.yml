@@ -1,0 +1,72 @@
+name: VoiceHub Plugin CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  DOTNET_VERSION: "10.0.x"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: VoiceHubLanDesktop
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Validate plugin metadata
+        shell: pwsh
+        run: .\VoiceHubLanDesktop\scripts\Test-PluginConsistency.ps1 -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path
+
+      - name: Resolve build metadata
+        id: metadata
+        shell: pwsh
+        run: |
+          $manifest = Get-Content .\VoiceHubLanDesktop\plugin.json -Raw | ConvertFrom-Json
+          $version = $manifest.version.Trim()
+          $assetName = "$($manifest.id).$version.laapp"
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "asset_name=$assetName" >> $env:GITHUB_OUTPUT
+
+      - name: Build plugin package
+        shell: pwsh
+        run: dotnet build .\VoiceHubLanDesktop\VoiceHubLanDesktop.csproj -c Release -v minimal
+
+      - name: Validate built package
+        shell: pwsh
+        run: .\VoiceHubLanDesktop\scripts\Test-PluginConsistency.ps1 -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path -PackagePath ".\VoiceHubLanDesktop\${{ steps.metadata.outputs.asset_name }}"
+
+      - name: Generate market metadata artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .\VoiceHubLanDesktop\artifacts | Out-Null
+          $packagePath = Resolve-Path ".\VoiceHubLanDesktop\${{ steps.metadata.outputs.asset_name }}"
+          .\VoiceHubLanDesktop\scripts\New-AirAppMarketSync.ps1 `
+            -TemplatePath .\VoiceHubLanDesktop\airappmarket-entry.template.json `
+            -PackagePath $packagePath `
+            -Version "${{ steps.metadata.outputs.version }}" `
+            -OutputPath .\VoiceHubLanDesktop\artifacts\airappmarket-sync.json
+
+      - name: Upload CI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: voicehub-plugin-ci
+          path: |
+            VoiceHubLanDesktop/${{ steps.metadata.outputs.asset_name }}
+            VoiceHubLanDesktop/artifacts/airappmarket-sync.json
+          if-no-files-found: error
+          retention-days: 14
