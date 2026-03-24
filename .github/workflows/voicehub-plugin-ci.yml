@@ -54,7 +54,7 @@ jobs:
         id: metadata
         shell: pwsh
         run: |
-          $manifest = Get-Content .\VoiceHubLanDesktop\plugin.json -Raw | ConvertFrom-Json
+          $manifest = Get-Content .\VoiceHubLanDesktop\plugin.json -Encoding UTF8 -Raw | ConvertFrom-Json
           $version = $manifest.version.Trim()
           $assetName = "$($manifest.id).$version.laapp"
           "version=$version" >> $env:GITHUB_OUTPUT

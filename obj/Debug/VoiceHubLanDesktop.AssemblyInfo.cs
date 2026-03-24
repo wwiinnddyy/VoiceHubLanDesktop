@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VoiceHubLanDesktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.0.1.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.0.1+26da01d1321608609e6406f4fcbfab8483691071")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.0.1+233223a9ba9fa08fcb346b9d154206474961d4c5")]
 [assembly: System.Reflection.AssemblyProductAttribute("VoiceHubLanDesktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VoiceHubLanDesktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.0.1.0")]

@@ -40,7 +40,7 @@ if (-not $csprojMatch.Success) {
 }
 
 $csprojVersion = Get-VersionCore $csprojMatch.Groups["version"].Value
-$manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+$manifest = Get-Content $manifestPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $manifestVersion = Get-VersionCore $manifest.version
 $manifestApiVersion = Get-VersionCore $manifest.apiVersion
 

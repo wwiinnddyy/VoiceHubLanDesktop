@@ -32,18 +32,34 @@ $updatedCsproj = [System.Text.RegularExpressions.Regex]::Replace(
 [System.IO.File]::WriteAllText($csprojPath, $updatedCsproj)
 Write-Host "Updated csproj version to $normalizedVersion"
 
-$manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+$manifest = Get-Content $manifestPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $manifest.version = $normalizedVersion
 $manifestJson = $manifest | ConvertTo-Json -Depth 10
 [System.IO.File]::WriteAllText($manifestPath, $manifestJson)
 Write-Host "Updated plugin.json version to $normalizedVersion"
 
 if (Test-Path $readmePath) {
-    $readmeContent = [System.IO.File]::ReadAllText($readmePath)
-    $updatedReadme = [System.Text.RegularExpressions.Regex]::Replace(
-        $readmeContent,
-        "Version:\s*`[^`]+`",
-        "Version: ``$normalizedVersion``")
-    [System.IO.File]::WriteAllText($readmePath, $updatedReadme)
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    $readmeLines = [System.IO.File]::ReadAllLines($readmePath, [System.Text.Encoding]::UTF8)
+    $updatedReadmeLines = foreach ($line in $readmeLines) {
+        if ($line -match '^(?<prefix>\s*-\s*(?:当前版本|Current version)：?\s*)`[^`]+`(?<suffix>.*)$') {
+            $Matches.prefix + '`' + $normalizedVersion + '`' + $Matches.suffix
+            continue
+        }
+
+        if ($line -match '^(?<prefix>\s*-\s*(?:当前 Release 标签|Current release tag)：?\s*)`[^`]+`(?<suffix>.*)$') {
+            $Matches.prefix + '`' + "v$normalizedVersion" + '`' + $Matches.suffix
+            continue
+        }
+
+        if ($line -match '^(?<prefix>\s*-\s*(?:当前根目录包名|Current root package)：?\s*)`[^`]+`(?<suffix>.*)$') {
+            $Matches.prefix + '`' + "VoiceHubLanDesktop.$normalizedVersion.laapp" + '`' + $Matches.suffix
+            continue
+        }
+
+        $line
+    }
+
+    [System.IO.File]::WriteAllLines($readmePath, $updatedReadmeLines, $utf8NoBom)
     Write-Host "Updated README.md version to $normalizedVersion"
 }

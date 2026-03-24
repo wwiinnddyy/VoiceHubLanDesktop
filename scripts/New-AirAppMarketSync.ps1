@@ -46,7 +46,7 @@ function Get-ArrayValue($Object, [string]$Name) {
     return @($value)
 }
 
-$template = Get-Content $TemplatePath -Raw | ConvertFrom-Json
+$template = Get-Content $TemplatePath -Encoding UTF8 -Raw | ConvertFrom-Json
 $resolvedPackagePath = Resolve-Path $PackagePath -ErrorAction Stop
 $assetName = [System.IO.Path]::GetFileName($resolvedPackagePath)
 $hash = (Get-FileHash -Path $resolvedPackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -59,9 +59,21 @@ try {
         throw "Plugin package '$resolvedPackagePath' does not contain 'plugin.json'."
     }
 
-    using ($stream = $manifestEntry.Open())
-    using ($reader = [System.IO.StreamReader]::new($stream)) {
+    $stream = $null
+    $reader = $null
+    try {
+        $stream = $manifestEntry.Open()
+        $reader = [System.IO.StreamReader]::new($stream)
         $manifestJson = $reader.ReadToEnd()
+    }
+    finally {
+        if ($reader) {
+            $reader.Dispose()
+        }
+
+        if ($stream) {
+            $stream.Dispose()
+        }
     }
 }
 finally {
