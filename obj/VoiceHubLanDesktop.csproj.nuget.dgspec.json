@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj": {}
+    "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj": {}
   },
   "projects": {
-    "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj": {
-      "version": "0.0.4",
+    "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj": {
+      "version": "0.0.5",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+        "projectUniqueName": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
         "projectName": "VoiceHubLanDesktop",
-        "projectPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+        "projectPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
         "packagesPath": "C:\\Users\\USER154971\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
+        "outputPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
+          "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
           "C:\\Users\\USER154971\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -22,7 +22,7 @@
           "net10.0"
         ],
         "sources": {
-          "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
+          "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

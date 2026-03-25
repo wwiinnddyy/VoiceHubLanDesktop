@@ -28,6 +28,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private VoiceHubSettingsService? _settingsService;
     private VoiceHubDataService? _dataService;
     private IPluginMessageBus? _messageBus;
+    private ISettingsService? _globalSettingsService;
 
     private readonly HttpClient _httpClient = new();
     private CancellationTokenSource? _cancellationTokenSource;
@@ -42,28 +43,29 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private readonly Dictionary<string, Bitmap> _coverCache = [];
 
     private bool _isDesignMode;
+    private double _lastKnownCornerRadiusScale = 1.0;
 
-    private static class NetEaseColors
+    private static class ThemeColors
     {
-        public static readonly Color LightPrimary = Color.Parse("#D43C33");
-        public static readonly Color LightPrimaryDark = Color.Parse("#C20B0B");
-        public static readonly Color LightBackground = Color.Parse("#FAFAFA");
-        public static readonly Color LightSurface = Color.Parse("#FFFFFFFF");
-        public static readonly Color LightText = Color.Parse("#333333");
-        public static readonly Color LightTextSecondary = Color.Parse("#666666");
-        public static readonly Color LightBorder = Color.Parse("#E5E5E5");
+        public static readonly Color LightCardBackground = Color.Parse("#FCFBFA");
+        public static readonly Color LightCardBorder = Color.Parse("#E8E8E8");
+        public static readonly Color LightText = Color.Parse("#2B2F35");
+        public static readonly Color LightTextSecondary = Color.Parse("#7A8088");
+        public static readonly Color LightIconBadgeBackground = Color.Parse("#14D43C33");
+        public static readonly Color LightIconBadgeBorder = Color.Parse("#20D43C33");
+        public static readonly Color LightRefreshButtonBackground = Color.Parse("#14A0A6AF");
 
-        public static readonly Color DarkPrimary = Color.Parse("#D43C33");
-        public static readonly Color DarkPrimaryLight = Color.Parse("#E85A52");
-        public static readonly Color DarkBackground = Color.Parse("#1A1A1A");
-        public static readonly Color DarkSurface = Color.Parse("#2A2A2A");
-        public static readonly Color DarkSurfaceLight = Color.Parse("#333333");
-        public static readonly Color DarkText = Color.Parse("#F5F5F5");
-        public static readonly Color DarkTextSecondary = Color.Parse("#B3B3B3");
-        public static readonly Color DarkBorder = Color.Parse("#3D3D3D");
+        public static readonly Color DarkCardBackground = Color.Parse("#1B2129");
+        public static readonly Color DarkCardBorder = Color.Parse("#2D3440");
+        public static readonly Color DarkText = Color.Parse("#E8EAED");
+        public static readonly Color DarkTextSecondary = Color.Parse("#A8B1C2");
+        public static readonly Color DarkIconBadgeBackground = Color.Parse("#2D3440");
+        public static readonly Color DarkIconBadgeBorder = Color.Parse("#3D4450");
+        public static readonly Color DarkRefreshButtonBackground = Color.Parse("#2D3440");
 
+        public static readonly Color Primary = Color.Parse("#D43C33");
         public static readonly Color Accent = Color.Parse("#FF6666");
-        public static readonly Color VoteHot = Color.Parse("#FF6B35");
+        public static readonly Color Warning = Color.Parse("#FF6B35");
     }
 
     public VoiceHubPlaylistWidget()
@@ -87,6 +89,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
         _settingsService = settingsService;
         _dataService = dataService;
         _messageBus = context.GetService<IPluginMessageBus>();
+        _globalSettingsService = context.GetService<ISettingsService>();
 
         _httpClient.Timeout = TimeSpan.FromSeconds(10);
 
@@ -98,6 +101,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
         _refreshTimer.Tick += async (_, _) => await RefreshAsync();
 
         _isDarkMode = ResolveIsDarkMode();
+        _lastKnownCornerRadiusScale = context.GlobalCornerRadiusScale;
         ApplyTheme();
 
         SetState(ComponentState.Loading);
@@ -108,6 +112,11 @@ public partial class VoiceHubPlaylistWidget : UserControl
         ActualThemeVariantChanged += OnThemeVariantChanged;
 
         _settingsService.SettingsChanged += OnSettingsChanged;
+
+        if (_globalSettingsService is not null)
+        {
+            _globalSettingsService.Changed += OnGlobalSettingsChanged;
+        }
     }
 
     private void SetupDesignTimePreview()
@@ -116,7 +125,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
         Height = 400;
 
         _isDarkMode = false;
-        ApplyDesignTimeTheme();
+        ApplyTheme();
 
         _currentSongs =
         [
@@ -161,35 +170,6 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
         SetState(ComponentState.Normal);
         UpdateSongsPanel();
-    }
-
-    private void ApplyDesignTimeTheme()
-    {
-        var cornerRadius = 16d;
-
-        Background = new LinearGradientBrush
-        {
-            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
-            EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
-            GradientStops =
-            [
-                new GradientStop(Color.Parse("#FFFFFFFF"), 0),
-                new GradientStop(Color.Parse("#FFFAFAFA"), 0.5),
-                new GradientStop(Color.Parse("#FFF5F5F5"), 1)
-            ]
-        };
-
-        RootBorder.CornerRadius = new CornerRadius(cornerRadius);
-        RootBorder.BorderBrush = new SolidColorBrush(NetEaseColors.LightBorder);
-
-        HeaderHost.Background = new SolidColorBrush(Color.Parse("#10D43C33"));
-        HeaderIcon.Foreground = new SolidColorBrush(NetEaseColors.LightPrimary);
-        HeaderText.Foreground = new SolidColorBrush(NetEaseColors.LightText);
-        HeaderText.Text = "声动校园歌单";
-        DateText.Foreground = new SolidColorBrush(NetEaseColors.LightTextSecondary);
-        DateText.Text = DateTime.Today.ToString("MM/dd");
-
-        SongsScrollViewer.Background = Brushes.Transparent;
     }
 
     private bool ResolveIsDarkMode()
@@ -240,8 +220,10 @@ public partial class VoiceHubPlaylistWidget : UserControl
     {
         if (_isDesignMode || _context is null) return;
 
-        var cornerRadius = _context.ResolveCornerRadius(PluginCornerRadiusPreset.Lg);
+        var cornerRadius = ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Lg);
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
+        CardBackground.CornerRadius = new CornerRadius(cornerRadius);
+        CardBorder.CornerRadius = new CornerRadius(cornerRadius);
 
         if (_isDarkMode)
         {
@@ -253,74 +235,83 @@ public partial class VoiceHubPlaylistWidget : UserControl
         }
     }
 
-    private void ApplyLightTheme(double cornerRadius)
+    private double ResolveCurrentCornerRadius(PluginCornerRadiusPreset preset)
     {
-        Background = new LinearGradientBrush
+        if (_context is null) return 24d;
+
+        var baseRadius = preset switch
         {
-            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
-            EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
-            GradientStops =
-            [
-                new GradientStop(Color.Parse("#FFFFFFFF"), 0),
-                new GradientStop(Color.Parse("#FFFAFAFA"), 0.5),
-                new GradientStop(Color.Parse("#FFF5F5F5"), 1)
-            ]
+            PluginCornerRadiusPreset.Micro => 6d,
+            PluginCornerRadiusPreset.Xs => 10d,
+            PluginCornerRadiusPreset.Sm => 14d,
+            PluginCornerRadiusPreset.Md => 18d,
+            PluginCornerRadiusPreset.Lg => 24d,
+            PluginCornerRadiusPreset.Xl => 30d,
+            PluginCornerRadiusPreset.Island => 36d,
+            _ => 18d
         };
 
-        RootBorder.Background = null;
-        RootBorder.BorderBrush = new SolidColorBrush(NetEaseColors.LightBorder);
+        return Math.Round(baseRadius * _lastKnownCornerRadiusScale * 2, MidpointRounding.AwayFromZero) / 2d;
+    }
 
-        HeaderHost.Background = new SolidColorBrush(Color.Parse("#10D43C33"));
-        HeaderIcon.Foreground = new SolidColorBrush(NetEaseColors.LightPrimary);
-        HeaderText.Foreground = new SolidColorBrush(NetEaseColors.LightText);
-        DateText.Foreground = new SolidColorBrush(NetEaseColors.LightTextSecondary);
+    private void ApplyLightTheme(double cornerRadius)
+    {
+        CardBorder.Background = new SolidColorBrush(ThemeColors.LightCardBackground);
+        CardBorder.BorderBrush = new SolidColorBrush(ThemeColors.LightCardBorder);
 
-        SongsScrollViewer.Background = Brushes.Transparent;
+        HeaderIconBadge.Background = new SolidColorBrush(ThemeColors.LightIconBadgeBackground);
+        HeaderIconBadge.BorderBrush = new SolidColorBrush(ThemeColors.LightIconBadgeBorder);
+        HeaderIcon.Foreground = new SolidColorBrush(ThemeColors.Primary);
 
-        LoadingHost.Background = new SolidColorBrush(Color.Parse("#10D43C33"));
+        HeaderText.Foreground = new SolidColorBrush(ThemeColors.LightText);
+        DateText.Foreground = new SolidColorBrush(ThemeColors.LightTextSecondary);
+
+        RefreshButton.Background = new SolidColorBrush(ThemeColors.LightRefreshButtonBackground);
+        RefreshIcon.Foreground = new SolidColorBrush(ThemeColors.LightTextSecondary);
+
+        LoadingHost.Background = new SolidColorBrush(Color.Parse("#14D43C33"));
         LoadingHost.CornerRadius = new CornerRadius(cornerRadius);
-        LoadingText.Foreground = new SolidColorBrush(NetEaseColors.LightTextSecondary);
+        LoadingText.Foreground = new SolidColorBrush(ThemeColors.LightTextSecondary);
 
-        ErrorHost.Background = new SolidColorBrush(Color.Parse("#10FF6B35"));
+        ErrorHost.Background = new SolidColorBrush(Color.Parse("#14FF6B35"));
         ErrorHost.BorderBrush = new SolidColorBrush(Color.Parse("#30FF6B35"));
         ErrorHost.CornerRadius = new CornerRadius(cornerRadius);
-        ErrorIcon.Foreground = new SolidColorBrush(NetEaseColors.VoteHot);
-        ErrorText.Foreground = new SolidColorBrush(NetEaseColors.LightText);
+        ErrorIcon.Foreground = new SolidColorBrush(ThemeColors.Warning);
+        ErrorText.Foreground = new SolidColorBrush(ThemeColors.LightText);
+
+        EmptyHost.Background = new SolidColorBrush(Color.Parse("#0C000000"));
+        EmptyHost.CornerRadius = new CornerRadius(cornerRadius);
+        EmptyText.Foreground = new SolidColorBrush(ThemeColors.LightTextSecondary);
     }
 
     private void ApplyDarkTheme(double cornerRadius)
     {
-        Background = new LinearGradientBrush
-        {
-            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
-            EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
-            GradientStops =
-            [
-                new GradientStop(Color.Parse("#FF1A1A1A"), 0),
-                new GradientStop(Color.Parse("#FF222222"), 0.5),
-                new GradientStop(Color.Parse("#FF2A2A2A"), 1)
-            ]
-        };
+        CardBorder.Background = new SolidColorBrush(ThemeColors.DarkCardBackground);
+        CardBorder.BorderBrush = new SolidColorBrush(ThemeColors.DarkCardBorder);
 
-        RootBorder.Background = null;
-        RootBorder.BorderBrush = new SolidColorBrush(NetEaseColors.DarkBorder);
+        HeaderIconBadge.Background = new SolidColorBrush(ThemeColors.DarkIconBadgeBackground);
+        HeaderIconBadge.BorderBrush = new SolidColorBrush(ThemeColors.DarkIconBadgeBorder);
+        HeaderIcon.Foreground = new SolidColorBrush(ThemeColors.Primary);
 
-        HeaderHost.Background = new SolidColorBrush(Color.Parse("#20D43C33"));
-        HeaderIcon.Foreground = new SolidColorBrush(NetEaseColors.DarkPrimary);
-        HeaderText.Foreground = new SolidColorBrush(NetEaseColors.DarkText);
-        DateText.Foreground = new SolidColorBrush(NetEaseColors.DarkTextSecondary);
+        HeaderText.Foreground = new SolidColorBrush(ThemeColors.DarkText);
+        DateText.Foreground = new SolidColorBrush(ThemeColors.DarkTextSecondary);
 
-        SongsScrollViewer.Background = Brushes.Transparent;
+        RefreshButton.Background = new SolidColorBrush(ThemeColors.DarkRefreshButtonBackground);
+        RefreshIcon.Foreground = new SolidColorBrush(ThemeColors.DarkTextSecondary);
 
         LoadingHost.Background = new SolidColorBrush(Color.Parse("#20D43C33"));
         LoadingHost.CornerRadius = new CornerRadius(cornerRadius);
-        LoadingText.Foreground = new SolidColorBrush(NetEaseColors.DarkTextSecondary);
+        LoadingText.Foreground = new SolidColorBrush(ThemeColors.DarkTextSecondary);
 
         ErrorHost.Background = new SolidColorBrush(Color.Parse("#20FF6B35"));
         ErrorHost.BorderBrush = new SolidColorBrush(Color.Parse("#30FF6B35"));
         ErrorHost.CornerRadius = new CornerRadius(cornerRadius);
-        ErrorIcon.Foreground = new SolidColorBrush(NetEaseColors.VoteHot);
-        ErrorText.Foreground = new SolidColorBrush(NetEaseColors.DarkText);
+        ErrorIcon.Foreground = new SolidColorBrush(ThemeColors.Warning);
+        ErrorText.Foreground = new SolidColorBrush(ThemeColors.DarkText);
+
+        EmptyHost.Background = new SolidColorBrush(Color.Parse("#1A1A1A1A"));
+        EmptyHost.CornerRadius = new CornerRadius(cornerRadius);
+        EmptyText.Foreground = new SolidColorBrush(ThemeColors.DarkTextSecondary);
     }
 
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
@@ -352,6 +343,11 @@ public partial class VoiceHubPlaylistWidget : UserControl
             bitmap.Dispose();
         }
         _coverCache.Clear();
+
+        if (_globalSettingsService is not null)
+        {
+            _globalSettingsService.Changed -= OnGlobalSettingsChanged;
+        }
     }
 
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
@@ -365,6 +361,31 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
         _refreshTimer.Interval = TimeSpan.FromMinutes(settings.RefreshIntervalMinutes);
         Dispatcher.UIThread.Post(async () => await RefreshAsync());
+    }
+
+    private void OnGlobalSettingsChanged(object? sender, SettingsChangedEvent e)
+    {
+        if (e.Scope != SettingsScope.App) return;
+
+        var changedKeys = e.ChangedKeys;
+        var shouldRefreshCornerRadius = changedKeys.Count == 0 ||
+            changedKeys.Contains("GlobalCornerRadiusScale", StringComparer.OrdinalIgnoreCase);
+
+        if (shouldRefreshCornerRadius && _context is not null)
+        {
+            var newScale = _globalSettingsService?.GetValue<double>(
+                SettingsScope.App, "GlobalCornerRadiusScale") ?? 1.0;
+
+            if (Math.Abs(newScale - _lastKnownCornerRadiusScale) > 0.001)
+            {
+                _lastKnownCornerRadiusScale = newScale;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ApplyTheme();
+                    ApplyScale();
+                });
+            }
+        }
     }
 
     private void SubscribeToPluginBus()
@@ -477,6 +498,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
             SongsScrollViewer.IsVisible = false;
             LoadingHost.IsVisible = false;
             ErrorHost.IsVisible = false;
+            EmptyHost.IsVisible = false;
 
             switch (state)
             {
@@ -501,8 +523,8 @@ public partial class VoiceHubPlaylistWidget : UserControl
                     break;
 
                 case ComponentState.NoSchedule:
-                    ErrorHost.IsVisible = true;
-                    ErrorText.Text = T("status.no_schedule", "暂无排期数据");
+                    EmptyHost.IsVisible = true;
+                    EmptyText.Text = T("status.no_schedule", "暂无排期数据");
                     HeaderText.Text = T("header.title", "声动校园歌单");
                     DateText.Text = "";
                     break;
@@ -516,31 +538,31 @@ public partial class VoiceHubPlaylistWidget : UserControl
     {
         Dispatcher.UIThread.Post(() =>
         {
-            SongsPanel.Children.Clear();
+            SongsStackPanel.Children.Clear();
 
             var settings = _settingsService?.GetSettings() ?? new VoiceHubSettings { MaxDisplayCount = 10, ShowRequester = true };
             var songs = _currentSongs.Take(settings.MaxDisplayCount).ToList();
             var basis = GetLayoutBasis();
 
-            var titleSize = Math.Clamp(basis * 0.055, 11, 15);
-            var detailSize = Math.Clamp(basis * 0.045, 9, 12);
+            var titleSize = Math.Clamp(basis * 0.042, 11, 15);
+            var detailSize = Math.Clamp(basis * 0.035, 9, 12);
 
             foreach (var item in songs)
             {
                 var song = item.Song;
                 var songCard = CreateSongCard(song, titleSize, detailSize, basis, settings);
-                SongsPanel.Children.Add(songCard);
+                SongsStackPanel.Children.Add(songCard);
             }
 
             if (_currentSongs.Count > settings.MaxDisplayCount)
             {
-                SongsPanel.Children.Add(new TextBlock
+                SongsStackPanel.Children.Add(new TextBlock
                 {
                     Text = T("status.more", "还有 {0} 首...", _currentSongs.Count - settings.MaxDisplayCount),
                     FontSize = detailSize,
                     Foreground = _isDarkMode
-                        ? new SolidColorBrush(NetEaseColors.DarkTextSecondary)
-                        : new SolidColorBrush(NetEaseColors.LightTextSecondary),
+                        ? new SolidColorBrush(ThemeColors.DarkTextSecondary)
+                        : new SolidColorBrush(ThemeColors.LightTextSecondary),
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 8, 0, 0)
                 });
@@ -550,20 +572,20 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private Border CreateSongCard(Song song, double titleSize, double detailSize, double basis, VoiceHubSettings? settings = null)
     {
-        var cardCornerRadius = _isDesignMode ? 8d : _context!.ResolveCornerRadius(PluginCornerRadiusPreset.Sm);
+        var cardCornerRadius = _isDesignMode ? 10d : ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Sm);
 
-        var surfaceColor = _isDarkMode ? NetEaseColors.DarkSurface : Color.Parse("#FFF8F8F8");
-        var textColor = _isDarkMode ? NetEaseColors.DarkText : NetEaseColors.LightText;
-        var textSecondaryColor = _isDarkMode ? NetEaseColors.DarkTextSecondary : NetEaseColors.LightTextSecondary;
-        var borderColor = _isDarkMode ? NetEaseColors.DarkBorder : Color.Parse("#FFE8E8E8");
+        var surfaceColor = _isDarkMode ? Color.Parse("#252B33") : Color.Parse("#F8F8F8");
+        var textColor = _isDarkMode ? ThemeColors.DarkText : ThemeColors.LightText;
+        var textSecondaryColor = _isDarkMode ? ThemeColors.DarkTextSecondary : ThemeColors.LightTextSecondary;
+        var borderColor = _isDarkMode ? Color.Parse("#3D4450") : Color.Parse("#E8E8E8");
 
-        var coverSize = Math.Clamp(basis * 0.095, 36, 52);
+        var coverSize = Math.Clamp(basis * 0.085, 36, 52);
         var coverBorder = new Border
         {
             Width = coverSize,
             Height = coverSize,
             CornerRadius = new CornerRadius(cardCornerRadius * 0.6),
-            Background = new SolidColorBrush(_isDarkMode ? NetEaseColors.DarkSurfaceLight : Color.Parse("#FFE8E8E8")),
+            Background = new SolidColorBrush(_isDarkMode ? Color.Parse("#3D4450") : Color.Parse("#E8E8E8")),
             ClipToBounds = true,
             VerticalAlignment = VerticalAlignment.Center
         };
@@ -572,8 +594,8 @@ public partial class VoiceHubPlaylistWidget : UserControl
         {
             Symbol = Symbol.MusicNote1,
             IconVariant = IconVariant.Regular,
-            FontSize = coverSize * 0.5,
-            Foreground = new SolidColorBrush(_isDarkMode ? NetEaseColors.DarkTextSecondary : NetEaseColors.LightTextSecondary),
+            FontSize = coverSize * 0.45,
+            Foreground = new SolidColorBrush(_isDarkMode ? ThemeColors.DarkTextSecondary : ThemeColors.LightTextSecondary),
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
@@ -615,26 +637,47 @@ public partial class VoiceHubPlaylistWidget : UserControl
             });
         }
 
+        var voteHost = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 3,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            IsVisible = song.VoteCount > 0
+        };
+
+        var voteIcon = new SymbolIcon
+        {
+            Symbol = Symbol.Fire,
+            IconVariant = IconVariant.Filled,
+            FontSize = detailSize * 1.1,
+            Foreground = new SolidColorBrush(ThemeColors.Warning),
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
         var voteText = new TextBlock
         {
-            Text = song.VoteCount > 0 ? $"🔥{song.VoteCount}" : "",
+            Text = song.VoteCount.ToString(),
             FontSize = detailSize,
-            Foreground = new SolidColorBrush(NetEaseColors.VoteHot),
-            VerticalAlignment = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Right
+            FontWeight = FontWeight.Medium,
+            Foreground = new SolidColorBrush(ThemeColors.Warning),
+            VerticalAlignment = VerticalAlignment.Center
         };
+
+        voteHost.Children.Add(voteIcon);
+        voteHost.Children.Add(voteText);
 
         var contentGrid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"),
-            ColumnSpacing = 8
+            ColumnSpacing = 10
         };
 
         contentGrid.Children.Add(coverBorder);
         contentGrid.Children.Add(infoPanel);
-        contentGrid.Children.Add(voteText);
+        contentGrid.Children.Add(voteHost);
         Grid.SetColumn(infoPanel, 1);
-        Grid.SetColumn(voteText, 2);
+        Grid.SetColumn(voteHost, 2);
 
         return new Border
         {
@@ -642,7 +685,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
             BorderBrush = new SolidColorBrush(borderColor),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(cardCornerRadius),
-            Padding = new Thickness(8, 6),
+            Padding = new Thickness(10, 8),
             Child = contentGrid
         };
     }
@@ -687,23 +730,40 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private void ApplyScale()
     {
         var basis = GetLayoutBasis();
-        var cornerRadius = _isDesignMode ? 16d : _context!.ResolveCornerRadius(PluginCornerRadiusPreset.Lg);
+        var cornerRadius = _isDesignMode ? 24d : ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Lg);
+        var smRadius = _isDesignMode ? 10d : ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Sm);
 
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
+        CardBackground.CornerRadius = new CornerRadius(cornerRadius);
+        CardBorder.CornerRadius = new CornerRadius(cornerRadius);
 
-        Padding = new Thickness(Math.Clamp(basis * 0.04, 8, 16));
+        var padding = Math.Clamp(basis * 0.035, 10, 18);
+        CardBorder.Padding = new Thickness(padding, padding * 0.875, padding, padding * 0.875);
 
-        HeaderHost.Padding = new Thickness(
-            Math.Clamp(basis * 0.06, 8, 14),
-            Math.Clamp(basis * 0.04, 6, 10));
-        HeaderText.FontSize = Math.Clamp(basis * 0.065, 13, 18);
-        HeaderIcon.FontSize = Math.Clamp(basis * 0.055, 12, 18);
-        DateText.FontSize = Math.Clamp(basis * 0.055, 11, 15);
+        HeaderGrid.ColumnSpacing = Math.Clamp(basis * 0.025, 8, 14);
+        HeaderGrid.Margin = new Thickness(0, 0, 0, Math.Clamp(basis * 0.03, 8, 14));
 
-        SongsScrollViewer.Padding = new Thickness(
-            Math.Clamp(basis * 0.04, 6, 12),
-            Math.Clamp(basis * 0.02, 4, 8));
-        SongsPanel.Spacing = Math.Clamp(basis * 0.025, 4, 8);
+        var iconBadgeSize = Math.Clamp(basis * 0.08, 32, 42);
+        HeaderIconBadge.Width = iconBadgeSize;
+        HeaderIconBadge.Height = iconBadgeSize;
+        HeaderIconBadge.CornerRadius = new CornerRadius(iconBadgeSize * 0.28);
+        HeaderIcon.FontSize = Math.Clamp(basis * 0.04, 14, 20);
+
+        HeaderStack.Spacing = Math.Clamp(basis * 0.005, 1, 4);
+        HeaderText.FontSize = Math.Clamp(basis * 0.045, 14, 20);
+        DateText.FontSize = Math.Clamp(basis * 0.032, 11, 15);
+
+        var refreshButtonSize = Math.Clamp(basis * 0.08, 30, 40);
+        RefreshButton.Width = refreshButtonSize;
+        RefreshButton.Height = refreshButtonSize;
+        RefreshButton.CornerRadius = new CornerRadius(refreshButtonSize / 2);
+        RefreshIcon.FontSize = Math.Clamp(basis * 0.035, 13, 18);
+
+        SongsStackPanel.Spacing = Math.Clamp(basis * 0.02, 5, 10);
+
+        LoadingHost.CornerRadius = new CornerRadius(smRadius);
+        ErrorHost.CornerRadius = new CornerRadius(smRadius);
+        EmptyHost.CornerRadius = new CornerRadius(smRadius);
 
         if (_currentState == ComponentState.Normal)
         {

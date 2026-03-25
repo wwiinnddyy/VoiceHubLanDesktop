@@ -3,76 +3,178 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:fi="using:FluentIcons.Avalonia"
-             xmlns:local="using:VoiceHubLanDesktop.Widgets"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
-             x:Class="VoiceHubLanDesktop.Widgets.VoiceHubPlaylistWidget"
-             x:Name="Root">
+             mc:Ignorable="d"
+             d:DesignWidth="640"
+             d:DesignHeight="320"
+             x:Class="VoiceHubLanDesktop.Widgets.VoiceHubPlaylistWidget">
 
-  <Border x:Name="RootBorder"
-          ClipToBounds="True"
-          BorderThickness="1">
-    <Grid RowDefinitions="Auto,*">
-      <Border x:Name="HeaderHost"
-              Grid.Row="0"
-              Padding="12,8">
-        <Grid ColumnDefinitions="Auto,*,Auto">
-          <fi:SymbolIcon x:Name="HeaderIcon"
-                         Grid.Column="0"
-                         Symbol="MusicNote2"
-                         IconVariant="Filled"
-                         FontSize="16"
-                         Margin="0,0,8,0"
-                         VerticalAlignment="Center" />
-          <TextBlock x:Name="HeaderText"
-                     Grid.Column="1"
-                     FontWeight="SemiBold"
-                     VerticalAlignment="Center" />
-          <TextBlock x:Name="DateText"
-                     Grid.Column="2"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Right" />
+    <UserControl.Styles>
+        <Style Selector="Border.playlist-card">
+            <Setter Property="Background" Value="#0C000000" />
+            <Setter Property="BorderBrush" Value="#1A000000" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Border.playlist-card:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="#14000000" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border x:Name="RootBorder"
+            CornerRadius="24"
+            ClipToBounds="True"
+            BorderThickness="0"
+            Padding="0">
+        <Grid>
+            <Border x:Name="CardBackground"
+                    CornerRadius="24"
+                    ClipToBounds="True">
+                <Border x:Name="CardBorder"
+                        CornerRadius="24"
+                        Background="#FCFBFA"
+                        BorderBrush="#E8E8E8"
+                        BorderThickness="1"
+                        Padding="16,14,16,14">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid x:Name="HeaderGrid"
+                              Grid.Row="0"
+                              ColumnDefinitions="Auto,*,Auto"
+                              ColumnSpacing="12"
+                              Margin="0,0,0,12">
+                            <Border x:Name="HeaderIconBadge"
+                                    Width="36"
+                                    Height="36"
+                                    CornerRadius="10"
+                                    Background="#14D43C33"
+                                    BorderBrush="#20D43C33"
+                                    BorderThickness="1">
+                                <fi:SymbolIcon x:Name="HeaderIcon"
+                                               Symbol="MusicNote2"
+                                               IconVariant="Filled"
+                                               FontSize="18"
+                                               Foreground="#D43C33"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                            </Border>
+
+                            <StackPanel x:Name="HeaderStack"
+                                        Grid.Column="1"
+                                        Spacing="2"
+                                        VerticalAlignment="Center">
+                                <TextBlock x:Name="HeaderText"
+                                           Text="VoiceHub Playlist"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="1"
+                                           Foreground="#2B2F35" />
+                                <TextBlock x:Name="DateText"
+                                           Text="Today"
+                                           FontSize="13"
+                                           FontWeight="Medium"
+                                           Foreground="#7A8088"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="1" />
+                            </StackPanel>
+
+                            <Button x:Name="RefreshButton"
+                                    Grid.Column="2"
+                                    Width="34"
+                                    Height="34"
+                                    CornerRadius="17"
+                                    Background="#14A0A6AF"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    Padding="0"
+                                    Focusable="False"
+                                    VerticalAlignment="Center">
+                                <fi:SymbolIcon x:Name="RefreshIcon"
+                                               Symbol="ArrowClockwise"
+                                               IconVariant="Regular"
+                                               FontSize="16"
+                                               Foreground="#626870" />
+                            </Button>
+                        </Grid>
+
+                        <ScrollViewer x:Name="SongsScrollViewer"
+                                      Grid.Row="1"
+                                      Background="Transparent"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="SongsStackPanel"
+                                        Spacing="8" />
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Border>
+
+            <Border x:Name="LoadingHost"
+                    IsVisible="False"
+                    CornerRadius="24"
+                    Background="#14D43C33"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Padding="20,14">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="10">
+                    <fi:SymbolIcon Symbol="ArrowSync"
+                                   IconVariant="Regular"
+                                   FontSize="18"
+                                   Foreground="#D43C33" />
+                    <TextBlock x:Name="LoadingText"
+                               Text="Loading..."
+                               FontSize="15"
+                               FontWeight="Medium"
+                               Foreground="#6B7078"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="ErrorHost"
+                    IsVisible="False"
+                    CornerRadius="24"
+                    Background="#14FF6B35"
+                    BorderBrush="#30FF6B35"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Padding="20,14">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="10">
+                    <fi:SymbolIcon x:Name="ErrorIcon"
+                                   Symbol="Warning"
+                                   IconVariant="Filled"
+                                   FontSize="18"
+                                   Foreground="#FF6B35" />
+                    <TextBlock x:Name="ErrorText"
+                               Text="Failed to load"
+                               FontSize="15"
+                               FontWeight="Medium"
+                               Foreground="#2B2F35"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="EmptyHost"
+                    IsVisible="False"
+                    CornerRadius="24"
+                    Background="#0C000000"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Padding="20,14">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="10">
+                    <fi:SymbolIcon Symbol="MusicNote1"
+                                   IconVariant="Regular"
+                                   FontSize="18"
+                                   Foreground="#7A8088" />
+                    <TextBlock x:Name="EmptyText"
+                               Text="No songs"
+                               FontSize="15"
+                               FontWeight="Medium"
+                               Foreground="#7A8088"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
         </Grid>
-      </Border>
-
-      <Grid Grid.Row="1">
-        <ScrollViewer x:Name="SongsScrollViewer"
-                      Padding="8,4"
-                      VerticalScrollBarVisibility="Hidden">
-          <StackPanel x:Name="SongsPanel"
-                      Spacing="4" />
-        </ScrollViewer>
-
-        <Border x:Name="LoadingHost"
-                IsVisible="False">
-          <StackPanel HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      Spacing="8">
-            <fi:SymbolIcon Symbol="ArrowSync"
-                           IconVariant="Regular"
-                           FontSize="24" />
-            <TextBlock x:Name="LoadingText"
-                       HorizontalAlignment="Center" />
-          </StackPanel>
-        </Border>
-
-        <Border x:Name="ErrorHost"
-                BorderThickness="1"
-                IsVisible="False">
-          <StackPanel HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      Spacing="8">
-            <fi:SymbolIcon x:Name="ErrorIcon"
-                           Symbol="Warning"
-                           IconVariant="Filled"
-                           FontSize="24" />
-            <TextBlock x:Name="ErrorText"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       TextWrapping="Wrap"
-                       TextAlignment="Center" />
-          </StackPanel>
-        </Border>
-      </Grid>
-    </Grid>
-  </Border>
+    </Border>
 </UserControl>
