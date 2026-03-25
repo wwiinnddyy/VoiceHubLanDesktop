@@ -16,6 +16,9 @@ public sealed class Song
 
     [JsonPropertyName("voteCount")]
     public int VoteCount { get; set; }
+
+    [JsonPropertyName("cover")]
+    public string? Cover { get; set; }
 }
 
 public sealed class SongItem

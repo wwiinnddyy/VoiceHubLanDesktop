@@ -13,10 +13,14 @@
     <SourceRoot Include="C:\Users\USER154971\.nuget\packages\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)skiasharp.nativeassets.webassembly\2.88.9\buildTransitive\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.props" Condition="Exists('$(NuGetPackageRoot)skiasharp.nativeassets.webassembly\2.88.9\buildTransitive\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.props')" />
+    <Import Project="$(NuGetPackageRoot)microcom.codegenerator.msbuild\0.11.0\buildTransitive\MicroCom.CodeGenerator.MSBuild.props" Condition="Exists('$(NuGetPackageRoot)microcom.codegenerator.msbuild\0.11.0\buildTransitive\MicroCom.CodeGenerator.MSBuild.props')" />
     <Import Project="$(NuGetPackageRoot)avalonia\11.3.12\buildTransitive\Avalonia.props" Condition="Exists('$(NuGetPackageRoot)avalonia\11.3.12\buildTransitive\Avalonia.props')" />
     <Import Project="$(NuGetPackageRoot)lanmountaindesktop.pluginsdk\4.0.0\buildTransitive\LanMountainDesktop.PluginSdk.props" Condition="Exists('$(NuGetPackageRoot)lanmountaindesktop.pluginsdk\4.0.0\buildTransitive\LanMountainDesktop.PluginSdk.props')" />
+    <Import Project="$(NuGetPackageRoot)harfbuzzsharp.nativeassets.webassembly\8.3.1.1\buildTransitive\netstandard1.0\HarfBuzzSharp.NativeAssets.WebAssembly.props" Condition="Exists('$(NuGetPackageRoot)harfbuzzsharp.nativeassets.webassembly\8.3.1.1\buildTransitive\netstandard1.0\HarfBuzzSharp.NativeAssets.WebAssembly.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgMicroCom_CodeGenerator_MSBuild Condition=" '$(PkgMicroCom_CodeGenerator_MSBuild)' == '' ">C:\Users\USER154971\.nuget\packages\microcom.codegenerator.msbuild\0.11.0</PkgMicroCom_CodeGenerator_MSBuild>
     <PkgAvalonia_BuildServices Condition=" '$(PkgAvalonia_BuildServices)' == '' ">C:\Users\USER154971\.nuget\packages\avalonia.buildservices\11.3.2</PkgAvalonia_BuildServices>
     <PkgAvalonia Condition=" '$(PkgAvalonia)' == '' ">C:\Users\USER154971\.nuget\packages\avalonia\11.3.12</PkgAvalonia>
   </PropertyGroup>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -9,7 +10,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.Threading;
+using FluentIcons.Avalonia;
+using FluentIcons.Common;
 using LanMountainDesktop.PluginSdk;
 using VoiceHubLanDesktop.Models;
 using VoiceHubLanDesktop.Services;
@@ -18,25 +23,58 @@ namespace VoiceHubLanDesktop.Widgets;
 
 public partial class VoiceHubPlaylistWidget : UserControl
 {
-    private readonly PluginDesktopComponentContext _context;
-    private readonly PluginLocalizer _localizer;
-    private readonly VoiceHubSettingsService _settingsService;
-    private readonly VoiceHubDataService _dataService;
-    private readonly IPluginMessageBus? _messageBus;
+    private PluginDesktopComponentContext? _context;
+    private PluginLocalizer? _localizer;
+    private VoiceHubSettingsService? _settingsService;
+    private VoiceHubDataService? _dataService;
+    private IPluginMessageBus? _messageBus;
 
     private readonly HttpClient _httpClient = new();
     private CancellationTokenSource? _cancellationTokenSource;
-    private readonly DispatcherTimer _refreshTimer;
+    private DispatcherTimer? _refreshTimer;
 
     private ComponentState _currentState = ComponentState.Loading;
     private List<SongItem> _currentSongs = [];
     private DateTime? _displayDate;
+    private bool _isDarkMode;
 
     private readonly List<IDisposable> _subscriptions = [];
+    private readonly Dictionary<string, Bitmap> _coverCache = [];
+
+    private bool _isDesignMode;
+
+    private static class NetEaseColors
+    {
+        public static readonly Color LightPrimary = Color.Parse("#D43C33");
+        public static readonly Color LightPrimaryDark = Color.Parse("#C20B0B");
+        public static readonly Color LightBackground = Color.Parse("#FAFAFA");
+        public static readonly Color LightSurface = Color.Parse("#FFFFFFFF");
+        public static readonly Color LightText = Color.Parse("#333333");
+        public static readonly Color LightTextSecondary = Color.Parse("#666666");
+        public static readonly Color LightBorder = Color.Parse("#E5E5E5");
+
+        public static readonly Color DarkPrimary = Color.Parse("#D43C33");
+        public static readonly Color DarkPrimaryLight = Color.Parse("#E85A52");
+        public static readonly Color DarkBackground = Color.Parse("#1A1A1A");
+        public static readonly Color DarkSurface = Color.Parse("#2A2A2A");
+        public static readonly Color DarkSurfaceLight = Color.Parse("#333333");
+        public static readonly Color DarkText = Color.Parse("#F5F5F5");
+        public static readonly Color DarkTextSecondary = Color.Parse("#B3B3B3");
+        public static readonly Color DarkBorder = Color.Parse("#3D3D3D");
+
+        public static readonly Color Accent = Color.Parse("#FF6666");
+        public static readonly Color VoteHot = Color.Parse("#FF6B35");
+    }
 
     public VoiceHubPlaylistWidget()
     {
         InitializeComponent();
+
+        _isDesignMode = Design.IsDesignMode;
+        if (_isDesignMode)
+        {
+            SetupDesignTimePreview();
+        }
     }
 
     public VoiceHubPlaylistWidget(
@@ -59,17 +97,163 @@ public partial class VoiceHubPlaylistWidget : UserControl
         };
         _refreshTimer.Tick += async (_, _) => await RefreshAsync();
 
-        SetupBackground();
+        _isDarkMode = ResolveIsDarkMode();
+        ApplyTheme();
+
         SetState(ComponentState.Loading);
 
         AttachedToVisualTree += OnAttachedToVisualTree;
         DetachedFromVisualTree += OnDetachedFromVisualTree;
         SizeChanged += OnSizeChanged;
+        ActualThemeVariantChanged += OnThemeVariantChanged;
 
         _settingsService.SettingsChanged += OnSettingsChanged;
     }
 
-    private void SetupBackground()
+    private void SetupDesignTimePreview()
+    {
+        Width = 300;
+        Height = 400;
+
+        _isDarkMode = false;
+        ApplyDesignTimeTheme();
+
+        _currentSongs =
+        [
+            new SongItem
+            {
+                Sequence = 1,
+                Song = new Song
+                {
+                    Title = "晴天",
+                    Artist = "周杰伦",
+                    Requester = "张三",
+                    VoteCount = 5,
+                    Cover = null
+                }
+            },
+            new SongItem
+            {
+                Sequence = 2,
+                Song = new Song
+                {
+                    Title = "七里香",
+                    Artist = "周杰伦",
+                    Requester = "李四",
+                    VoteCount = 3,
+                    Cover = null
+                }
+            },
+            new SongItem
+            {
+                Sequence = 3,
+                Song = new Song
+                {
+                    Title = "稻香",
+                    Artist = "周杰伦",
+                    Requester = "王五",
+                    VoteCount = 8,
+                    Cover = null
+                }
+            }
+        ];
+        _displayDate = DateTime.Today;
+
+        SetState(ComponentState.Normal);
+        UpdateSongsPanel();
+    }
+
+    private void ApplyDesignTimeTheme()
+    {
+        var cornerRadius = 16d;
+
+        Background = new LinearGradientBrush
+        {
+            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+            EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
+            GradientStops =
+            [
+                new GradientStop(Color.Parse("#FFFFFFFF"), 0),
+                new GradientStop(Color.Parse("#FFFAFAFA"), 0.5),
+                new GradientStop(Color.Parse("#FFF5F5F5"), 1)
+            ]
+        };
+
+        RootBorder.CornerRadius = new CornerRadius(cornerRadius);
+        RootBorder.BorderBrush = new SolidColorBrush(NetEaseColors.LightBorder);
+
+        HeaderHost.Background = new SolidColorBrush(Color.Parse("#10D43C33"));
+        HeaderIcon.Foreground = new SolidColorBrush(NetEaseColors.LightPrimary);
+        HeaderText.Foreground = new SolidColorBrush(NetEaseColors.LightText);
+        HeaderText.Text = "声动校园歌单";
+        DateText.Foreground = new SolidColorBrush(NetEaseColors.LightTextSecondary);
+        DateText.Text = DateTime.Today.ToString("MM/dd");
+
+        SongsScrollViewer.Background = Brushes.Transparent;
+    }
+
+    private bool ResolveIsDarkMode()
+    {
+        if (_isDesignMode || _context is null)
+        {
+            return false;
+        }
+
+        var themeVariant = _context.Appearance.Snapshot.ThemeVariant;
+        if (string.Equals(themeVariant, "Dark", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (string.Equals(themeVariant, "Light", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (ActualThemeVariant == ThemeVariant.Dark)
+        {
+            return true;
+        }
+
+        if (ActualThemeVariant == ThemeVariant.Light)
+        {
+            return false;
+        }
+
+        return Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+    }
+
+    private void OnThemeVariantChanged(object? sender, EventArgs e)
+    {
+        if (_isDesignMode) return;
+
+        var newIsDarkMode = ResolveIsDarkMode();
+        if (_isDarkMode != newIsDarkMode)
+        {
+            _isDarkMode = newIsDarkMode;
+            ApplyTheme();
+            UpdateSongsPanel();
+        }
+    }
+
+    private void ApplyTheme()
+    {
+        if (_isDesignMode || _context is null) return;
+
+        var cornerRadius = _context.ResolveCornerRadius(PluginCornerRadiusPreset.Lg);
+        RootBorder.CornerRadius = new CornerRadius(cornerRadius);
+
+        if (_isDarkMode)
+        {
+            ApplyDarkTheme(cornerRadius);
+        }
+        else
+        {
+            ApplyLightTheme(cornerRadius);
+        }
+    }
+
+    private void ApplyLightTheme(double cornerRadius)
     {
         Background = new LinearGradientBrush
         {
@@ -77,23 +261,84 @@ public partial class VoiceHubPlaylistWidget : UserControl
             EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
             GradientStops =
             [
-                new GradientStop(Color.Parse("#FF07111F"), 0),
-                new GradientStop(Color.Parse("#FF0C4A6E"), 0.55),
-                new GradientStop(Color.Parse("#FF0EA5E9"), 1)
+                new GradientStop(Color.Parse("#FFFFFFFF"), 0),
+                new GradientStop(Color.Parse("#FFFAFAFA"), 0.5),
+                new GradientStop(Color.Parse("#FFF5F5F5"), 1)
             ]
         };
+
+        RootBorder.Background = null;
+        RootBorder.BorderBrush = new SolidColorBrush(NetEaseColors.LightBorder);
+
+        HeaderHost.Background = new SolidColorBrush(Color.Parse("#10D43C33"));
+        HeaderIcon.Foreground = new SolidColorBrush(NetEaseColors.LightPrimary);
+        HeaderText.Foreground = new SolidColorBrush(NetEaseColors.LightText);
+        DateText.Foreground = new SolidColorBrush(NetEaseColors.LightTextSecondary);
+
+        SongsScrollViewer.Background = Brushes.Transparent;
+
+        LoadingHost.Background = new SolidColorBrush(Color.Parse("#10D43C33"));
+        LoadingHost.CornerRadius = new CornerRadius(cornerRadius);
+        LoadingText.Foreground = new SolidColorBrush(NetEaseColors.LightTextSecondary);
+
+        ErrorHost.Background = new SolidColorBrush(Color.Parse("#10FF6B35"));
+        ErrorHost.BorderBrush = new SolidColorBrush(Color.Parse("#30FF6B35"));
+        ErrorHost.CornerRadius = new CornerRadius(cornerRadius);
+        ErrorIcon.Foreground = new SolidColorBrush(NetEaseColors.VoteHot);
+        ErrorText.Foreground = new SolidColorBrush(NetEaseColors.LightText);
+    }
+
+    private void ApplyDarkTheme(double cornerRadius)
+    {
+        Background = new LinearGradientBrush
+        {
+            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+            EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
+            GradientStops =
+            [
+                new GradientStop(Color.Parse("#FF1A1A1A"), 0),
+                new GradientStop(Color.Parse("#FF222222"), 0.5),
+                new GradientStop(Color.Parse("#FF2A2A2A"), 1)
+            ]
+        };
+
+        RootBorder.Background = null;
+        RootBorder.BorderBrush = new SolidColorBrush(NetEaseColors.DarkBorder);
+
+        HeaderHost.Background = new SolidColorBrush(Color.Parse("#20D43C33"));
+        HeaderIcon.Foreground = new SolidColorBrush(NetEaseColors.DarkPrimary);
+        HeaderText.Foreground = new SolidColorBrush(NetEaseColors.DarkText);
+        DateText.Foreground = new SolidColorBrush(NetEaseColors.DarkTextSecondary);
+
+        SongsScrollViewer.Background = Brushes.Transparent;
+
+        LoadingHost.Background = new SolidColorBrush(Color.Parse("#20D43C33"));
+        LoadingHost.CornerRadius = new CornerRadius(cornerRadius);
+        LoadingText.Foreground = new SolidColorBrush(NetEaseColors.DarkTextSecondary);
+
+        ErrorHost.Background = new SolidColorBrush(Color.Parse("#20FF6B35"));
+        ErrorHost.BorderBrush = new SolidColorBrush(Color.Parse("#30FF6B35"));
+        ErrorHost.CornerRadius = new CornerRadius(cornerRadius);
+        ErrorIcon.Foreground = new SolidColorBrush(NetEaseColors.VoteHot);
+        ErrorText.Foreground = new SolidColorBrush(NetEaseColors.DarkText);
     }
 
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
+        if (_isDesignMode) return;
+
         SubscribeToPluginBus();
+        _isDarkMode = ResolveIsDarkMode();
+        ApplyTheme();
         _ = RefreshAsync();
-        _refreshTimer.Start();
+        _refreshTimer?.Start();
     }
 
     private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        _refreshTimer.Stop();
+        if (_isDesignMode) return;
+
+        _refreshTimer?.Stop();
         _cancellationTokenSource?.Cancel();
 
         foreach (var subscription in _subscriptions)
@@ -101,6 +346,12 @@ public partial class VoiceHubPlaylistWidget : UserControl
             subscription.Dispose();
         }
         _subscriptions.Clear();
+
+        foreach (var bitmap in _coverCache.Values)
+        {
+            bitmap.Dispose();
+        }
+        _coverCache.Clear();
     }
 
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
@@ -110,6 +361,8 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private void OnSettingsChanged(object? sender, VoiceHubSettings settings)
     {
+        if (_refreshTimer is null) return;
+
         _refreshTimer.Interval = TimeSpan.FromMinutes(settings.RefreshIntervalMinutes);
         Dispatcher.UIThread.Post(async () => await RefreshAsync());
     }
@@ -132,6 +385,8 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private async Task LoadDataAsync()
     {
+        if (_settingsService is null) return;
+
         _cancellationTokenSource?.Cancel();
         _cancellationTokenSource = new CancellationTokenSource();
 
@@ -263,7 +518,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
         {
             SongsPanel.Children.Clear();
 
-            var settings = _settingsService.GetSettings();
+            var settings = _settingsService?.GetSettings() ?? new VoiceHubSettings { MaxDisplayCount = 10, ShowRequester = true };
             var songs = _currentSongs.Take(settings.MaxDisplayCount).ToList();
             var basis = GetLayoutBasis();
 
@@ -273,7 +528,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
             foreach (var item in songs)
             {
                 var song = item.Song;
-                var songCard = CreateSongCard(item, song, titleSize, detailSize, basis);
+                var songCard = CreateSongCard(song, titleSize, detailSize, basis, settings);
                 SongsPanel.Children.Add(songCard);
             }
 
@@ -283,7 +538,9 @@ public partial class VoiceHubPlaylistWidget : UserControl
                 {
                     Text = T("status.more", "还有 {0} 首...", _currentSongs.Count - settings.MaxDisplayCount),
                     FontSize = detailSize,
-                    Foreground = new SolidColorBrush(Color.Parse("#FF93C5FD")),
+                    Foreground = _isDarkMode
+                        ? new SolidColorBrush(NetEaseColors.DarkTextSecondary)
+                        : new SolidColorBrush(NetEaseColors.LightTextSecondary),
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 8, 0, 0)
                 });
@@ -291,25 +548,41 @@ public partial class VoiceHubPlaylistWidget : UserControl
         });
     }
 
-    private Border CreateSongCard(SongItem item, Song song, double titleSize, double detailSize, double basis)
+    private Border CreateSongCard(Song song, double titleSize, double detailSize, double basis, VoiceHubSettings? settings = null)
     {
-        var sequenceBorder = new Border
+        var cardCornerRadius = _isDesignMode ? 8d : _context!.ResolveCornerRadius(PluginCornerRadiusPreset.Sm);
+
+        var surfaceColor = _isDarkMode ? NetEaseColors.DarkSurface : Color.Parse("#FFF8F8F8");
+        var textColor = _isDarkMode ? NetEaseColors.DarkText : NetEaseColors.LightText;
+        var textSecondaryColor = _isDarkMode ? NetEaseColors.DarkTextSecondary : NetEaseColors.LightTextSecondary;
+        var borderColor = _isDarkMode ? NetEaseColors.DarkBorder : Color.Parse("#FFE8E8E8");
+
+        var coverSize = Math.Clamp(basis * 0.095, 36, 52);
+        var coverBorder = new Border
         {
-            Width = Math.Clamp(basis * 0.06, 18, 28),
-            Height = Math.Clamp(basis * 0.06, 18, 28),
-            CornerRadius = new CornerRadius(4),
-            Background = new SolidColorBrush(Color.Parse("#FF38BDF8")),
-            VerticalAlignment = VerticalAlignment.Center,
-            Child = new TextBlock
-            {
-                Text = $"#{item.Sequence}",
-                FontSize = detailSize,
-                FontWeight = FontWeight.Bold,
-                Foreground = Brushes.White,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            }
+            Width = coverSize,
+            Height = coverSize,
+            CornerRadius = new CornerRadius(cardCornerRadius * 0.6),
+            Background = new SolidColorBrush(_isDarkMode ? NetEaseColors.DarkSurfaceLight : Color.Parse("#FFE8E8E8")),
+            ClipToBounds = true,
+            VerticalAlignment = VerticalAlignment.Center
         };
+
+        var fallbackIcon = new SymbolIcon
+        {
+            Symbol = Symbol.MusicNote1,
+            IconVariant = IconVariant.Regular,
+            FontSize = coverSize * 0.5,
+            Foreground = new SolidColorBrush(_isDarkMode ? NetEaseColors.DarkTextSecondary : NetEaseColors.LightTextSecondary),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        coverBorder.Child = fallbackIcon;
+
+        if (!string.IsNullOrWhiteSpace(song.Cover))
+        {
+            _ = LoadCoverAsync(song.Cover, coverBorder, coverSize);
+        }
 
         var infoPanel = new StackPanel
         {
@@ -322,20 +595,20 @@ public partial class VoiceHubPlaylistWidget : UserControl
             Text = $"{song.Artist} - {song.Title}",
             FontSize = titleSize,
             FontWeight = FontWeight.SemiBold,
-            Foreground = Brushes.White,
+            Foreground = new SolidColorBrush(textColor),
             TextWrapping = TextWrapping.Wrap,
             MaxLines = 2,
             TextTrimming = TextTrimming.CharacterEllipsis
         });
 
-        var settings = _settingsService.GetSettings();
-        if (settings.ShowRequester)
+        var effectiveSettings = settings ?? _settingsService?.GetSettings() ?? new VoiceHubSettings { MaxDisplayCount = 10, ShowRequester = true };
+        if (effectiveSettings.ShowRequester)
         {
             infoPanel.Children.Add(new TextBlock
             {
                 Text = T("song.requester", "点歌：{0}", song.Requester),
                 FontSize = detailSize,
-                Foreground = new SolidColorBrush(Color.Parse("#FFBAE6FD")),
+                Foreground = new SolidColorBrush(textSecondaryColor),
                 TextWrapping = TextWrapping.Wrap,
                 MaxLines = 1,
                 TextTrimming = TextTrimming.CharacterEllipsis
@@ -346,7 +619,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
         {
             Text = song.VoteCount > 0 ? $"🔥{song.VoteCount}" : "",
             FontSize = detailSize,
-            Foreground = new SolidColorBrush(Color.Parse("#FFFBBF24")),
+            Foreground = new SolidColorBrush(NetEaseColors.VoteHot),
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Right
         };
@@ -357,7 +630,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
             ColumnSpacing = 8
         };
 
-        contentGrid.Children.Add(sequenceBorder);
+        contentGrid.Children.Add(coverBorder);
         contentGrid.Children.Add(infoPanel);
         contentGrid.Children.Add(voteText);
         Grid.SetColumn(infoPanel, 1);
@@ -365,18 +638,58 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
         return new Border
         {
-            Background = new SolidColorBrush(Color.Parse("#1F082F49")),
-            BorderBrush = new SolidColorBrush(Color.Parse("#3338BDF8")),
+            Background = new SolidColorBrush(surfaceColor),
+            BorderBrush = new SolidColorBrush(borderColor),
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(cardCornerRadius),
             Padding = new Thickness(8, 6),
             Child = contentGrid
         };
     }
 
+    private async Task LoadCoverAsync(string coverUrl, Border coverBorder, double coverSize)
+    {
+        if (_coverCache.TryGetValue(coverUrl, out var cachedBitmap))
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                coverBorder.Child = new Image
+                {
+                    Source = cachedBitmap,
+                    Stretch = Stretch.UniformToFill
+                };
+            });
+            return;
+        }
+
+        try
+        {
+            var imageBytes = await _httpClient.GetByteArrayAsync(coverUrl);
+            using var stream = new MemoryStream(imageBytes);
+            var bitmap = new Bitmap(stream);
+
+            _coverCache[coverUrl] = bitmap;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                coverBorder.Child = new Image
+                {
+                    Source = bitmap,
+                    Stretch = Stretch.UniformToFill
+                };
+            });
+        }
+        catch
+        {
+        }
+    }
+
     private void ApplyScale()
     {
         var basis = GetLayoutBasis();
+        var cornerRadius = _isDesignMode ? 16d : _context!.ResolveCornerRadius(PluginCornerRadiusPreset.Lg);
+
+        RootBorder.CornerRadius = new CornerRadius(cornerRadius);
 
         Padding = new Thickness(Math.Clamp(basis * 0.04, 8, 16));
 
@@ -384,6 +697,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
             Math.Clamp(basis * 0.06, 8, 14),
             Math.Clamp(basis * 0.04, 6, 10));
         HeaderText.FontSize = Math.Clamp(basis * 0.065, 13, 18);
+        HeaderIcon.FontSize = Math.Clamp(basis * 0.055, 12, 18);
         DateText.FontSize = Math.Clamp(basis * 0.055, 11, 15);
 
         SongsScrollViewer.Padding = new Thickness(
@@ -399,19 +713,24 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private double GetLayoutBasis()
     {
-        var width = Bounds.Width > 1 ? Bounds.Width : _context.CellSize * 3;
-        var height = Bounds.Height > 1 ? Bounds.Height : _context.CellSize * 4;
-        return Math.Max(_context.CellSize * 3, Math.Min(width, height));
+        if (_isDesignMode)
+        {
+            return Math.Min(Bounds.Width, Bounds.Height);
+        }
+
+        var width = Bounds.Width > 1 ? Bounds.Width : _context!.CellSize * 3;
+        var height = Bounds.Height > 1 ? Bounds.Height : _context!.CellSize * 4;
+        return Math.Max(_context!.CellSize * 3, Math.Min(width, height));
     }
 
     private string T(string key, string fallback)
     {
-        return _localizer.GetString(key, fallback);
+        return _localizer?.GetString(key, fallback) ?? fallback;
     }
 
     private string T(string key, string fallback, params object[] args)
     {
-        return _localizer.Format(key, fallback, args);
+        return _localizer?.Format(key, fallback, args) ?? string.Format(fallback, args);
     }
 }
 
