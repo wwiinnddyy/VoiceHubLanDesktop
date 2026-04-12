@@ -212,7 +212,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
     {
         if (_isDesignMode || _context is null) return;
 
-        var cornerRadius = _context.Appearance.GetShellCornerRadius();
+        var cornerRadius = _context.CornerRadiusTokens.Component;
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);
         CardBorder.CornerRadius = new CornerRadius(cornerRadius);
@@ -545,7 +545,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private Border CreateSongCard(Song song, double titleSize, double detailSize, double basis, VoiceHubSettings? settings = null)
     {
-        var cardCornerRadius = _isDesignMode ? 10d : _context?.Appearance.GetCardCornerRadius() ?? 14d;
+        var cardCornerRadius = _isDesignMode ? 10d : _context?.CornerRadiusTokens.Sm ?? 14d;
 
         var surfaceColor = _isDarkMode ? Color.Parse("#252B33") : Color.Parse("#F8F8F8");
         var textColor = _isDarkMode ? ThemeColors.DarkText : ThemeColors.LightText;
@@ -703,8 +703,8 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private void ApplyScale()
     {
         var basis = GetLayoutBasis();
-        var cornerRadius = _isDesignMode ? 24d : _context?.Appearance.GetShellCornerRadius() ?? 24d;
-        var smRadius = _isDesignMode ? 10d : _context?.Appearance.GetCardCornerRadius() ?? 14d;
+        var cornerRadius = _isDesignMode ? 24d : _context?.CornerRadiusTokens.Component ?? 24d;
+        var smRadius = _isDesignMode ? 10d : _context?.CornerRadiusTokens.Sm ?? 14d;
 
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);
