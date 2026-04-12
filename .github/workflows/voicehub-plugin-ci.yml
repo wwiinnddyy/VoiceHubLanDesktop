@@ -46,6 +46,11 @@ jobs:
             -PluginSdkProjectPath $sdkProject `
             -CoreContractsProjectPath $contractsProject
 
+      - name: Clear NuGet cache
+        shell: pwsh
+        run: |
+          dotnet nuget locals all --clear
+
       - name: Validate plugin metadata
         shell: pwsh
         run: .\VoiceHubLanDesktop\scripts\Test-PluginConsistency.ps1 -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path
