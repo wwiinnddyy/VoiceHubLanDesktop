@@ -28,7 +28,6 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private VoiceHubSettingsService? _settingsService;
     private VoiceHubDataService? _dataService;
     private IPluginMessageBus? _messageBus;
-    private ISettingsService? _globalSettingsService;
 
     private readonly HttpClient _httpClient = new();
     private CancellationTokenSource? _cancellationTokenSource;
@@ -43,7 +42,6 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private readonly Dictionary<string, Bitmap> _coverCache = [];
 
     private bool _isDesignMode;
-    private double _lastKnownCornerRadiusScale = 1.0;
 
     private static class ThemeColors
     {
@@ -89,7 +87,6 @@ public partial class VoiceHubPlaylistWidget : UserControl
         _settingsService = settingsService;
         _dataService = dataService;
         _messageBus = context.GetService<IPluginMessageBus>();
-        _globalSettingsService = context.GetService<ISettingsService>();
 
         _httpClient.Timeout = TimeSpan.FromSeconds(10);
 
@@ -101,7 +98,6 @@ public partial class VoiceHubPlaylistWidget : UserControl
         _refreshTimer.Tick += async (_, _) => await RefreshAsync();
 
         _isDarkMode = ResolveIsDarkMode();
-        _lastKnownCornerRadiusScale = context.GlobalCornerRadiusScale;
         ApplyTheme();
 
         SetState(ComponentState.Loading);
@@ -112,11 +108,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
         ActualThemeVariantChanged += OnThemeVariantChanged;
 
         _settingsService.SettingsChanged += OnSettingsChanged;
-
-        if (_globalSettingsService is not null)
-        {
-            _globalSettingsService.Changed += OnGlobalSettingsChanged;
-        }
+        _context.Appearance.Changed += OnAppearanceChanged;
     }
 
     private void SetupDesignTimePreview()
@@ -220,7 +212,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
     {
         if (_isDesignMode || _context is null) return;
 
-        var cornerRadius = ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Lg);
+        var cornerRadius = _context.Appearance.GetShellCornerRadius();
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);
         CardBorder.CornerRadius = new CornerRadius(cornerRadius);
@@ -233,25 +225,6 @@ public partial class VoiceHubPlaylistWidget : UserControl
         {
             ApplyLightTheme(cornerRadius);
         }
-    }
-
-    private double ResolveCurrentCornerRadius(PluginCornerRadiusPreset preset)
-    {
-        if (_context is null) return 24d;
-
-        var baseRadius = preset switch
-        {
-            PluginCornerRadiusPreset.Micro => 6d,
-            PluginCornerRadiusPreset.Xs => 10d,
-            PluginCornerRadiusPreset.Sm => 14d,
-            PluginCornerRadiusPreset.Md => 18d,
-            PluginCornerRadiusPreset.Lg => 24d,
-            PluginCornerRadiusPreset.Xl => 30d,
-            PluginCornerRadiusPreset.Island => 36d,
-            _ => 18d
-        };
-
-        return Math.Round(baseRadius * _lastKnownCornerRadiusScale * 2, MidpointRounding.AwayFromZero) / 2d;
     }
 
     private void ApplyLightTheme(double cornerRadius)
@@ -344,9 +317,9 @@ public partial class VoiceHubPlaylistWidget : UserControl
         }
         _coverCache.Clear();
 
-        if (_globalSettingsService is not null)
+        if (_context is not null)
         {
-            _globalSettingsService.Changed -= OnGlobalSettingsChanged;
+            _context.Appearance.Changed -= OnAppearanceChanged;
         }
     }
 
@@ -363,28 +336,28 @@ public partial class VoiceHubPlaylistWidget : UserControl
         Dispatcher.UIThread.Post(async () => await RefreshAsync());
     }
 
-    private void OnGlobalSettingsChanged(object? sender, SettingsChangedEvent e)
+    private void OnAppearanceChanged(object? sender, AppearanceChangedEvent e)
     {
-        if (e.Scope != SettingsScope.App) return;
+        if (_context is null) return;
 
-        var changedKeys = e.ChangedKeys;
-        var shouldRefreshCornerRadius = changedKeys.Count == 0 ||
-            changedKeys.Contains("GlobalCornerRadiusScale", StringComparer.OrdinalIgnoreCase);
+        var shouldRefresh = e.ChangedProperties.Count == 0 ||
+            e.CornerRadiusChanged ||
+            e.ThemeVariantChanged;
 
-        if (shouldRefreshCornerRadius && _context is not null)
+        if (shouldRefresh)
         {
-            var newScale = _globalSettingsService?.GetValue<double>(
-                SettingsScope.App, "GlobalCornerRadiusScale") ?? 1.0;
-
-            if (Math.Abs(newScale - _lastKnownCornerRadiusScale) > 0.001)
+            var newIsDarkMode = ResolveIsDarkMode();
+            if (_isDarkMode != newIsDarkMode)
             {
-                _lastKnownCornerRadiusScale = newScale;
-                Dispatcher.UIThread.Post(() =>
-                {
-                    ApplyTheme();
-                    ApplyScale();
-                });
+                _isDarkMode = newIsDarkMode;
             }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                ApplyTheme();
+                ApplyScale();
+                UpdateSongsPanel();
+            });
         }
     }
 
@@ -572,7 +545,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private Border CreateSongCard(Song song, double titleSize, double detailSize, double basis, VoiceHubSettings? settings = null)
     {
-        var cardCornerRadius = _isDesignMode ? 10d : ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Sm);
+        var cardCornerRadius = _isDesignMode ? 10d : _context?.Appearance.GetCardCornerRadius() ?? 14d;
 
         var surfaceColor = _isDarkMode ? Color.Parse("#252B33") : Color.Parse("#F8F8F8");
         var textColor = _isDarkMode ? ThemeColors.DarkText : ThemeColors.LightText;
@@ -730,8 +703,8 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private void ApplyScale()
     {
         var basis = GetLayoutBasis();
-        var cornerRadius = _isDesignMode ? 24d : ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Lg);
-        var smRadius = _isDesignMode ? 10d : ResolveCurrentCornerRadius(PluginCornerRadiusPreset.Sm);
+        var cornerRadius = _isDesignMode ? 24d : _context?.Appearance.GetShellCornerRadius() ?? 24d;
+        var smRadius = _isDesignMode ? 10d : _context?.Appearance.GetCardCornerRadius() ?? 14d;
 
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);

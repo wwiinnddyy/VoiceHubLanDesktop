@@ -503,37 +503,6 @@
           }
         }
       },
-      "LanMountainDesktop.PluginSdk/4.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Avalonia": "11.3.12",
-          "LanMountainDesktop.Shared.Contracts": "1.0.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.0"
-        },
-        "compile": {
-          "lib/net10.0/LanMountainDesktop.PluginSdk.dll": {}
-        },
-        "runtime": {
-          "lib/net10.0/_._": {}
-        },
-        "build": {
-          "buildTransitive/LanMountainDesktop.PluginSdk.props": {},
-          "buildTransitive/LanMountainDesktop.PluginSdk.targets": {}
-        }
-      },
-      "LanMountainDesktop.Shared.Contracts/1.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Avalonia": "11.3.12"
-        },
-        "compile": {
-          "lib/net10.0/LanMountainDesktop.Shared.Contracts.dll": {}
-        },
-        "runtime": {
-          "lib/net10.0/_._": {}
-        }
-      },
       "MicroCom.CodeGenerator.MSBuild/0.11.0": {
         "type": "package",
         "build": {
@@ -811,6 +780,35 @@
         },
         "runtime": {
           "lib/net8.0/Tmds.DBus.Protocol.dll": {}
+        }
+      },
+      "LanMountainDesktop.PluginSdk/4.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Avalonia": "11.3.12",
+          "LanMountainDesktop.Shared.Contracts": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.0"
+        },
+        "compile": {
+          "bin/placeholder/LanMountainDesktop.PluginSdk.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/_._": {}
+        }
+      },
+      "LanMountainDesktop.Shared.Contracts/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Avalonia": "11.3.12"
+        },
+        "compile": {
+          "bin/placeholder/LanMountainDesktop.Shared.Contracts.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/_._": {}
         }
       }
     }
@@ -1457,32 +1455,6 @@
         "runtimes/win-x86/native/libHarfBuzzSharp.dll"
       ]
     },
-    "LanMountainDesktop.PluginSdk/4.0.0": {
-      "sha512": "2kwUqAzltvCsJtWG9o0wkFL0ykXfgCAUIWfscVhMN8eWv1OprQrLdVkCucm6zLWGLk+kr6zxwJ3s3LVBmebMNg==",
-      "type": "package",
-      "path": "lanmountaindesktop.pluginsdk/4.0.0",
-      "files": [
-        ".nupkg.metadata",
-        "README.md",
-        "buildTransitive/LanMountainDesktop.PluginSdk.props",
-        "buildTransitive/LanMountainDesktop.PluginSdk.targets",
-        "lanmountaindesktop.pluginsdk.4.0.0.nupkg.sha512",
-        "lanmountaindesktop.pluginsdk.nuspec",
-        "lib/net10.0/LanMountainDesktop.PluginSdk.dll"
-      ]
-    },
-    "LanMountainDesktop.Shared.Contracts/1.0.0": {
-      "sha512": "BPJgdzi8cuTPH1uLIexBxCpc+5HrQTIarc4rsV529lhf84dEjknxmTXpGA+reBYhmIJiZO9ewFqUrclbS5xSNQ==",
-      "type": "package",
-      "path": "lanmountaindesktop.shared.contracts/1.0.0",
-      "files": [
-        ".nupkg.metadata",
-        "README.md",
-        "lanmountaindesktop.shared.contracts.1.0.0.nupkg.sha512",
-        "lanmountaindesktop.shared.contracts.nuspec",
-        "lib/net10.0/LanMountainDesktop.Shared.Contracts.dll"
-      ]
-    },
     "MicroCom.CodeGenerator.MSBuild/0.11.0": {
       "sha512": "CiRuIIvycn7RqT7p72+JdJsw1/No/1nc0Vs45Qkbvkn/uryWU57dGAUaqy9p2trRDvbsRBdQgF1hWLNUpgUSQw==",
       "type": "package",
@@ -2085,6 +2057,16 @@
         "tmds.dbus.protocol.0.21.2.nupkg.sha512",
         "tmds.dbus.protocol.nuspec"
       ]
+    },
+    "LanMountainDesktop.PluginSdk/4.0.0": {
+      "type": "project",
+      "path": "../LanMountainDesktop/LanMountainDesktop.PluginSdk/LanMountainDesktop.PluginSdk.csproj",
+      "msbuildProject": "../LanMountainDesktop/LanMountainDesktop.PluginSdk/LanMountainDesktop.PluginSdk.csproj"
+    },
+    "LanMountainDesktop.Shared.Contracts/1.0.0": {
+      "type": "project",
+      "path": "../LanMountainDesktop/LanMountainDesktop.Shared.Contracts/LanMountainDesktop.Shared.Contracts.csproj",
+      "msbuildProject": "../LanMountainDesktop/LanMountainDesktop.Shared.Contracts/LanMountainDesktop.Shared.Contracts.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -2101,30 +2083,35 @@
     "C:\\Users\\USER154971\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "0.0.5",
+    "version": "0.0.6",
     "restore": {
-      "projectUniqueName": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "projectUniqueName": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
       "projectName": "VoiceHubLanDesktop",
-      "projectPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "projectPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
       "packagesPath": "C:\\Users\\USER154971\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
+      "outputPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
-        "C:\\Users\\USER154971\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
+        "C:\\Users\\USER154971\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
+        "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\USER154971\\Documents\\GitHub\\LanMountainDesktop\\LanMountainDesktop.PluginSdk\\LanMountainDesktop.PluginSdk.csproj": {
+              "projectPath": "C:\\Users\\USER154971\\Documents\\GitHub\\LanMountainDesktop\\LanMountainDesktop.PluginSdk\\LanMountainDesktop.PluginSdk.csproj",
+              "excludeAssets": "runtime",
+              "privateAssets": "all"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -2162,12 +2149,6 @@
           "FluentIcons.Avalonia.Fluent": {
             "target": "Package",
             "version": "[2.0.319, )"
-          },
-          "LanMountainDesktop.PluginSdk": {
-            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[4.0.0, )"
           }
         },
         "imports": [
@@ -2463,5 +2444,17 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "包 \"Tmds.DBus.Protocol\" 0.21.2 具有已知的 高 严重性漏洞，https://github.com/advisories/GHSA-xrw6-gwf8-vvr9",
+      "libraryId": "Tmds.DBus.Protocol",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

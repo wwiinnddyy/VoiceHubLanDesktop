@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "olkoxrOrDt0=",
+  "dgSpecHash": "v537Q2cB0Gk=",
   "success": true,
-  "projectFilePath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+  "projectFilePath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\USER154971\\.nuget\\packages\\avalonia\\11.3.12\\avalonia.11.3.12.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.25547.20250602\\avalonia.angle.windows.natives.2.1.25547.20250602.nupkg.sha512",
@@ -28,8 +28,6 @@
     "C:\\Users\\USER154971\\.nuget\\packages\\harfbuzzsharp.nativeassets.macos\\8.3.1.1\\harfbuzzsharp.nativeassets.macos.8.3.1.1.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\harfbuzzsharp.nativeassets.webassembly\\8.3.1.1\\harfbuzzsharp.nativeassets.webassembly.8.3.1.1.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\harfbuzzsharp.nativeassets.win32\\8.3.1.1\\harfbuzzsharp.nativeassets.win32.8.3.1.1.nupkg.sha512",
-    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.pluginsdk\\4.0.0\\lanmountaindesktop.pluginsdk.4.0.0.nupkg.sha512",
-    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.shared.contracts\\1.0.0\\lanmountaindesktop.shared.contracts.1.0.0.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\microcom.codegenerator.msbuild\\0.11.0\\microcom.codegenerator.msbuild.0.11.0.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\microcom.runtime\\0.11.0\\microcom.runtime.0.11.0.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.0\\microsoft.extensions.configuration.abstractions.10.0.0.nupkg.sha512",
@@ -45,7 +43,22 @@
     "C:\\Users\\USER154971\\.nuget\\packages\\skiasharp.nativeassets.macos\\2.88.9\\skiasharp.nativeassets.macos.2.88.9.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\skiasharp.nativeassets.webassembly\\2.88.9\\skiasharp.nativeassets.webassembly.2.88.9.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.9\\skiasharp.nativeassets.win32.2.88.9.nupkg.sha512",
-    "C:\\Users\\USER154971\\.nuget\\packages\\tmds.dbus.protocol\\0.21.2\\tmds.dbus.protocol.0.21.2.nupkg.sha512"
+    "C:\\Users\\USER154971\\.nuget\\packages\\tmds.dbus.protocol\\0.21.2\\tmds.dbus.protocol.0.21.2.nupkg.sha512",
+    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.pluginsdk\\4.0.0\\lanmountaindesktop.pluginsdk.4.0.0.nupkg.sha512",
+    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.shared.contracts\\1.0.0\\lanmountaindesktop.shared.contracts.1.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "包 \"Tmds.DBus.Protocol\" 0.21.2 具有已知的 高 严重性漏洞，https://github.com/advisories/GHSA-xrw6-gwf8-vvr9",
+      "projectPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "libraryId": "Tmds.DBus.Protocol",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

@@ -6,13 +6,14 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "VoiceHubLanDesktop/0.0.5": {
+      "VoiceHubLanDesktop/0.0.6": {
         "dependencies": {
           "Avalonia": "11.3.12",
           "Avalonia.Desktop": "11.3.12",
           "Avalonia.Themes.Fluent": "11.3.12",
           "FluentIcons.Avalonia": "2.0.319",
-          "FluentIcons.Avalonia.Fluent": "2.0.319"
+          "FluentIcons.Avalonia.Fluent": "2.0.319",
+          "LanMountainDesktop.PluginSdk": "4.0.0"
         },
         "runtime": {
           "VoiceHubLanDesktop.dll": {}
@@ -475,11 +476,34 @@
             "fileVersion": "0.21.2.0"
           }
         }
+      },
+      "LanMountainDesktop.PluginSdk/4.0.0": {
+        "dependencies": {
+          "Avalonia": "11.3.12",
+          "LanMountainDesktop.Shared.Contracts": "1.0.0"
+        },
+        "runtime": {
+          "LanMountainDesktop.PluginSdk.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.0.0.0"
+          }
+        }
+      },
+      "LanMountainDesktop.Shared.Contracts/1.0.0": {
+        "dependencies": {
+          "Avalonia": "11.3.12"
+        },
+        "runtime": {
+          "LanMountainDesktop.Shared.Contracts.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
   "libraries": {
-    "VoiceHubLanDesktop/0.0.5": {
+    "VoiceHubLanDesktop/0.0.6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -679,6 +703,16 @@
       "sha512": "sha512-ScSMrUrrw8px4kK1Glh0fZv/HQUlg1078bNXNPfRPKQ3WbRzV9HpsydYEOgSoMK5LWICMf2bMwIFH0pGjxjcMA==",
       "path": "tmds.dbus.protocol/0.21.2",
       "hashPath": "tmds.dbus.protocol.0.21.2.nupkg.sha512"
+    },
+    "LanMountainDesktop.PluginSdk/4.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LanMountainDesktop.Shared.Contracts/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }
