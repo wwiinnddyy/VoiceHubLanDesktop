@@ -45,38 +45,8 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.Base.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.Controls.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.DesignerSupport.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.Dialogs.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.Markup.Xaml.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.Markup.dll": {
-            "related": ".Xaml.xml;.xml"
-          },
-          "lib/net8.0/Avalonia.Metal.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.MicroCom.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.OpenGL.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.Vulkan.dll": {
-            "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.dll": {
-            "related": ".Base.xml;.Controls.xml;.DesignerSupport.xml;.Dialogs.xml;.Markup.Xaml.xml;.Markup.xml;.Metal.xml;.MicroCom.xml;.OpenGL.xml;.Vulkan.xml;.xml"
           }
         },
         "build": {
@@ -87,17 +57,9 @@
       "Avalonia.Angle.Windows.Natives/2.1.25547.20250602": {
         "type": "package",
         "runtimeTargets": {
-          "runtimes/win-arm64/native/av_libglesv2.dll": {
-            "assetType": "native",
-            "rid": "win-arm64"
-          },
-          "runtimes/win-x64/native/av_libglesv2.dll": {
+          "runtimes/win-x64/native/_._": {
             "assetType": "native",
             "rid": "win-x64"
-          },
-          "runtimes/win-x86/native/av_libglesv2.dll": {
-            "assetType": "native",
-            "rid": "win-x86"
           }
         }
       },
@@ -119,7 +81,7 @@
           }
         },
         "runtime": {
-          "lib/net6.0/Avalonia.Controls.ColorPicker.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         }
@@ -136,7 +98,7 @@
           }
         },
         "runtime": {
-          "lib/net6.0/Avalonia.Controls.DataGrid.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         }
@@ -152,7 +114,7 @@
           }
         },
         "runtime": {
-          "lib/net6.0/Avalonia.Controls.ItemsRepeater.dll": {
+          "lib/net6.0/_._": {
             "related": ".xml"
           }
         }
@@ -172,7 +134,7 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.Desktop.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         }
@@ -189,7 +151,7 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.FreeDesktop.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         }
@@ -200,17 +162,17 @@
           "Avalonia": "11.3.12"
         },
         "compile": {
-          "lib/net8.0/Avalonia.Native.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.Native.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         },
         "runtimeTargets": {
-          "runtimes/osx/native/libAvaloniaNative.dylib": {
+          "runtimes/osx/native/_._": {
             "assetType": "native",
             "rid": "osx"
           }
@@ -224,7 +186,7 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.Remote.Protocol.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         }
@@ -246,7 +208,7 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.Skia.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         }
@@ -262,7 +224,7 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.Themes.Fluent.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         }
@@ -282,11 +244,8 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.Win32.Automation.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
-          },
-          "lib/net8.0/Avalonia.Win32.dll": {
-            "related": ".Automation.xml;.xml"
           }
         }
       },
@@ -303,7 +262,7 @@
           }
         },
         "runtime": {
-          "lib/net8.0/Avalonia.X11.dll": {
+          "lib/net8.0/_._": {
             "related": ".xml"
           }
         }
@@ -325,7 +284,7 @@
           }
         },
         "runtime": {
-          "lib/net6.0/FluentAvalonia.dll": {
+          "lib/net6.0/_._": {
             "related": ".pdb;.xml"
           }
         }
@@ -341,7 +300,7 @@
           "lib/net6.0/FluentIcons.Avalonia.dll": {}
         },
         "runtime": {
-          "lib/net6.0/FluentIcons.Avalonia.dll": {}
+          "lib/net6.0/_._": {}
         }
       },
       "FluentIcons.Avalonia.Fluent/2.0.319": {
@@ -355,7 +314,7 @@
           "lib/net6.0/FluentIcons.Avalonia.Fluent.dll": {}
         },
         "runtime": {
-          "lib/net6.0/FluentIcons.Avalonia.Fluent.dll": {}
+          "lib/net6.0/_._": {}
         }
       },
       "FluentIcons.Common/2.0.319": {
@@ -364,7 +323,7 @@
           "lib/netstandard2.1/FluentIcons.Common.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.1/FluentIcons.Common.dll": {}
+          "lib/netstandard2.1/_._": {}
         }
       },
       "FluentIcons.Resources.Avalonia/2.0.319": {
@@ -377,7 +336,7 @@
           "lib/netstandard2.0/FluentIcons.Resources.Avalonia.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/FluentIcons.Resources.Avalonia.dll": {}
+          "lib/netstandard2.0/_._": {}
         }
       },
       "HarfBuzzSharp/8.3.1.1": {
@@ -392,7 +351,7 @@
           }
         },
         "runtime": {
-          "lib/net8.0/HarfBuzzSharp.dll": {
+          "lib/net8.0/_._": {
             "related": ".pdb"
           }
         }
@@ -406,49 +365,9 @@
           "lib/net8.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/linux-arm/native/libHarfBuzzSharp.so": {
+          "runtimes/linux-arm/native/_._": {
             "assetType": "native",
             "rid": "linux-arm"
-          },
-          "runtimes/linux-arm64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-arm64"
-          },
-          "runtimes/linux-loongarch64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-loongarch64"
-          },
-          "runtimes/linux-musl-arm/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-musl-arm"
-          },
-          "runtimes/linux-musl-arm64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-musl-arm64"
-          },
-          "runtimes/linux-musl-loongarch64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-musl-loongarch64"
-          },
-          "runtimes/linux-musl-riscv64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-musl-riscv64"
-          },
-          "runtimes/linux-musl-x64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-musl-x64"
-          },
-          "runtimes/linux-riscv64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-riscv64"
-          },
-          "runtimes/linux-x64/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-x64"
-          },
-          "runtimes/linux-x86/native/libHarfBuzzSharp.so": {
-            "assetType": "native",
-            "rid": "linux-x86"
           }
         }
       },
@@ -461,7 +380,7 @@
           "lib/net8.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/osx/native/libHarfBuzzSharp.dylib": {
+          "runtimes/osx/native/_._": {
             "assetType": "native",
             "rid": "osx"
           }
@@ -476,8 +395,7 @@
           "lib/net8.0/_._": {}
         },
         "build": {
-          "buildTransitive/netstandard1.0/HarfBuzzSharp.NativeAssets.WebAssembly.props": {},
-          "buildTransitive/netstandard1.0/HarfBuzzSharp.NativeAssets.WebAssembly.targets": {}
+          "buildTransitive/netstandard1.0/_._": {}
         }
       },
       "HarfBuzzSharp.NativeAssets.Win32/8.3.1.1": {
@@ -489,17 +407,9 @@
           "lib/net8.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win-arm64/native/libHarfBuzzSharp.dll": {
-            "assetType": "native",
-            "rid": "win-arm64"
-          },
-          "runtimes/win-x64/native/libHarfBuzzSharp.dll": {
+          "runtimes/win-x64/native/_._": {
             "assetType": "native",
             "rid": "win-x64"
-          },
-          "runtimes/win-x86/native/libHarfBuzzSharp.dll": {
-            "assetType": "native",
-            "rid": "win-x86"
           }
         }
       },
@@ -551,7 +461,7 @@
           "lib/net5.0/MicroCom.Runtime.dll": {}
         },
         "runtime": {
-          "lib/net5.0/MicroCom.Runtime.dll": {}
+          "lib/net5.0/_._": {}
         }
       },
       "Microsoft.Extensions.Configuration.Abstractions/10.0.0": {
@@ -718,7 +628,7 @@
           }
         },
         "runtime": {
-          "lib/net6.0/SkiaSharp.dll": {
+          "lib/net6.0/_._": {
             "related": ".pdb;.xml"
           }
         }
@@ -735,21 +645,9 @@
           "lib/net6.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/linux-arm/native/libSkiaSharp.so": {
+          "runtimes/linux-arm/native/_._": {
             "assetType": "native",
             "rid": "linux-arm"
-          },
-          "runtimes/linux-arm64/native/libSkiaSharp.so": {
-            "assetType": "native",
-            "rid": "linux-arm64"
-          },
-          "runtimes/linux-musl-x64/native/libSkiaSharp.so": {
-            "assetType": "native",
-            "rid": "linux-musl-x64"
-          },
-          "runtimes/linux-x64/native/libSkiaSharp.so": {
-            "assetType": "native",
-            "rid": "linux-x64"
           }
         }
       },
@@ -762,7 +660,7 @@
           "lib/net6.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/osx/native/libSkiaSharp.dylib": {
+          "runtimes/osx/native/_._": {
             "assetType": "native",
             "rid": "osx"
           }
@@ -777,8 +675,7 @@
           "lib/netstandard1.0/_._": {}
         },
         "build": {
-          "buildTransitive/netstandard1.0/SkiaSharp.NativeAssets.WebAssembly.props": {},
-          "buildTransitive/netstandard1.0/SkiaSharp.NativeAssets.WebAssembly.targets": {}
+          "buildTransitive/netstandard1.0/_._": {}
         }
       },
       "SkiaSharp.NativeAssets.Win32/2.88.9": {
@@ -790,17 +687,9 @@
           "lib/net6.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win-arm64/native/libSkiaSharp.dll": {
-            "assetType": "native",
-            "rid": "win-arm64"
-          },
-          "runtimes/win-x64/native/libSkiaSharp.dll": {
+          "runtimes/win-x64/native/_._": {
             "assetType": "native",
             "rid": "win-x64"
-          },
-          "runtimes/win-x86/native/libSkiaSharp.dll": {
-            "assetType": "native",
-            "rid": "win-x86"
           }
         }
       },
@@ -810,7 +699,7 @@
           "lib/net8.0/Tmds.DBus.Protocol.dll": {}
         },
         "runtime": {
-          "lib/net8.0/Tmds.DBus.Protocol.dll": {}
+          "lib/net8.0/_._": {}
         }
       }
     }
@@ -1458,7 +1347,7 @@
       ]
     },
     "LanMountainDesktop.PluginSdk/4.0.0": {
-      "sha512": "KfFO6Eka/kDQTjGIYuLQAcMNQ0n+shldgBp2AbWT9ctZfffge8Lhyiaind3tSWTPreRT8QU5I6ObB+22XdE+xA==",
+      "sha512": "pUMMMHrJ/oVbQsunQ8q/qshxem65yJeiBQrVPIPiMLdGCmPaLtt6fklUIi5EJTs8ubOcL5D5VlbgBwMlCTX3zg==",
       "type": "package",
       "path": "lanmountaindesktop.pluginsdk/4.0.0",
       "files": [
@@ -1472,7 +1361,7 @@
       ]
     },
     "LanMountainDesktop.Shared.Contracts/1.0.0": {
-      "sha512": "iM13cvNej5Fiv01injTO1tVdibRdlZXS8p9QQ0luuQnhUNPvR9mCx6kE9hi4bUxYwPYQ+jEHMlmAh0oUO6tScg==",
+      "sha512": "MOKGOtZwN4DXC1fX+mCUpbgWArDQgM+q9Fw9PeiwwZspAwI14xGNz5FuSwmk2qAEb7GdTAwy4YD2Fc/T7tOD9g==",
       "type": "package",
       "path": "lanmountaindesktop.shared.contracts/1.0.0",
       "files": [
@@ -2090,34 +1979,44 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "Avalonia >= 11.3.12",
+      "Avalonia.Angle.Windows.Natives >= 2.1.25547.20250602",
       "Avalonia.Desktop >= 11.3.12",
+      "Avalonia.Native >= 11.3.12",
       "Avalonia.Themes.Fluent >= 11.3.12",
       "FluentIcons.Avalonia >= 2.0.319",
       "FluentIcons.Avalonia.Fluent >= 2.0.319",
-      "LanMountainDesktop.PluginSdk >= 4.0.0"
+      "HarfBuzzSharp.NativeAssets.Linux >= 8.3.1.1",
+      "HarfBuzzSharp.NativeAssets.WebAssembly >= 8.3.1.1",
+      "HarfBuzzSharp.NativeAssets.Win32 >= 8.3.1.1",
+      "HarfBuzzSharp.NativeAssets.macOS >= 8.3.1.1",
+      "LanMountainDesktop.PluginSdk >= 4.0.0",
+      "SkiaSharp.NativeAssets.Linux >= 2.88.9",
+      "SkiaSharp.NativeAssets.WebAssembly >= 2.88.9",
+      "SkiaSharp.NativeAssets.Win32 >= 2.88.9",
+      "SkiaSharp.NativeAssets.macOS >= 2.88.9"
     ]
   },
   "packageFolders": {
     "C:\\Users\\USER154971\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "0.0.6",
+    "version": "0.0.7",
     "restore": {
-      "projectUniqueName": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "projectUniqueName": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
       "projectName": "VoiceHubLanDesktop",
-      "projectPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "projectPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
       "packagesPath": "C:\\Users\\USER154971\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
+      "outputPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
+        "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
         "C:\\Users\\USER154971\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
+        "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2143,30 +2042,85 @@
         "targetAlias": "net10.0",
         "dependencies": {
           "Avalonia": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "target": "Package",
             "version": "[11.3.12, )"
           },
+          "Avalonia.Angle.Windows.Natives": {
+            "include": "None",
+            "target": "Package",
+            "version": "[2.1.25547.20250602, )"
+          },
           "Avalonia.Desktop": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[11.3.12, )"
+          },
+          "Avalonia.Native": {
+            "include": "None",
             "target": "Package",
             "version": "[11.3.12, )"
           },
           "Avalonia.Themes.Fluent": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "target": "Package",
             "version": "[11.3.12, )"
           },
           "FluentIcons.Avalonia": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "target": "Package",
             "version": "[2.0.319, )"
           },
           "FluentIcons.Avalonia.Fluent": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "target": "Package",
             "version": "[2.0.319, )"
+          },
+          "HarfBuzzSharp.NativeAssets.Linux": {
+            "include": "None",
+            "target": "Package",
+            "version": "[8.3.1.1, )"
+          },
+          "HarfBuzzSharp.NativeAssets.WebAssembly": {
+            "include": "None",
+            "target": "Package",
+            "version": "[8.3.1.1, )"
+          },
+          "HarfBuzzSharp.NativeAssets.Win32": {
+            "include": "None",
+            "target": "Package",
+            "version": "[8.3.1.1, )"
+          },
+          "HarfBuzzSharp.NativeAssets.macOS": {
+            "include": "None",
+            "target": "Package",
+            "version": "[8.3.1.1, )"
           },
           "LanMountainDesktop.PluginSdk": {
             "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "suppressParent": "All",
             "target": "Package",
             "version": "[4.0.0, )"
+          },
+          "SkiaSharp.NativeAssets.Linux": {
+            "include": "None",
+            "target": "Package",
+            "version": "[2.88.9, )"
+          },
+          "SkiaSharp.NativeAssets.WebAssembly": {
+            "include": "None",
+            "target": "Package",
+            "version": "[2.88.9, )"
+          },
+          "SkiaSharp.NativeAssets.Win32": {
+            "include": "None",
+            "target": "Package",
+            "version": "[2.88.9, )"
+          },
+          "SkiaSharp.NativeAssets.macOS": {
+            "include": "None",
+            "target": "Package",
+            "version": "[2.88.9, )"
           }
         },
         "imports": [
