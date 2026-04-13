@@ -26,6 +26,8 @@ public sealed class Plugin : PluginBase
 
         services.AddSingleton<VoiceHubDataService>();
 
+        // Register settings section using SDK's declarative configuration
+        // Note: Custom View (VoiceHubSettingsView) is ready to use when SDK supports SetCustomView
         services.AddPluginSettingsSection(
             id: "voicehub-settings",
             titleLocalizationKey: "settings.page_title",

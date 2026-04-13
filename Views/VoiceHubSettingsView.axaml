@@ -1,0 +1,354 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:vm="using:VoiceHubLanDesktop.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="600"
+             d:DesignHeight="500"
+             x:Class="VoiceHubLanDesktop.Views.VoiceHubSettingsView"
+             x:DataType="vm:VoiceHubSettingsViewModel">
+
+    <UserControl.Styles>
+        <!-- Section Card Style -->
+        <Style Selector="Border.settings-section">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <!-- Section Header Style -->
+        <Style Selector="StackPanel.section-header">
+            <Setter Property="Spacing" Value="4" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.section-description">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        </Style>
+
+        <!-- Setting Item Style -->
+        <Style Selector="Grid.setting-item">
+            <Setter Property="Margin" Value="0,12,0,0" />
+        </Style>
+
+        <Style Selector="Grid.setting-item:first-child">
+            <Setter Property="Margin" Value="0" />
+        </Style>
+
+        <Style Selector="StackPanel.setting-info">
+            <Setter Property="Spacing" Value="2" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="TextBlock.setting-label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.setting-desc">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        </Style>
+
+        <!-- TextBox Style -->
+        <Style Selector="TextBox.setting-input">
+            <Setter Property="Width" Value="280" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+
+        <!-- NumericUpDown Style -->
+        <Style Selector="NumericUpDown.setting-number">
+            <Setter Property="Width" Value="120" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+
+        <!-- ToggleSwitch Style -->
+        <Style Selector="ToggleSwitch.setting-toggle">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!-- Action Button Style -->
+        <Style Selector="Button.action-button">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="Button.action-button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}" />
+        </Style>
+
+        <!-- Secondary Button Style -->
+        <Style Selector="Button.secondary-button">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.secondary-button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}" />
+        </Style>
+
+        <!-- Status Badge Style -->
+        <Style Selector="Border.status-badge">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Border.status-badge.success">
+            <Setter Property="Background" Value="{DynamicResource SuccessBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="Border.status-badge.error">
+            <Setter Property="Background" Value="{DynamicResource ErrorBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.status-text">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Border.status-badge.success TextBlock.status-text">
+            <Setter Property="Foreground" Value="{DynamicResource SuccessForegroundBrush}" />
+        </Style>
+
+        <Style Selector="Border.status-badge.error TextBlock.status-text">
+            <Setter Property="Foreground" Value="{DynamicResource ErrorForegroundBrush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer Background="Transparent"
+                  HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,20"
+                    Spacing="0">
+
+            <!-- Connection Settings Section -->
+            <Border Classes="settings-section">
+                <StackPanel>
+                    <StackPanel Classes="section-header">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8">
+                            <fi:SymbolIcon Symbol="Globe"
+                                           IconVariant="Filled"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource PrimaryBrush}" />
+                            <TextBlock Classes="section-title"
+                                       Text="{Binding ConnectionSectionTitle}" />
+                        </StackPanel>
+                        <TextBlock Classes="section-description"
+                                   Text="{Binding ConnectionSectionDescription}" />
+                    </StackPanel>
+
+                    <!-- API URL Setting -->
+                    <Grid Classes="setting-item"
+                          ColumnDefinitions="*,Auto">
+                        <StackPanel Classes="setting-info">
+                            <TextBlock Classes="setting-label"
+                                       Text="{Binding ApiUrlLabel}" />
+                            <TextBlock Classes="setting-desc"
+                                       Text="{Binding ApiUrlDescription}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                            <TextBox Classes="setting-input"
+                                     Text="{Binding ApiUrl, Mode=TwoWay}"
+                                     Watermark="https://..." />
+                            <Button x:Name="TestConnectionButton"
+                                    Classes="secondary-button"
+                                    Padding="12,0"
+                                    Click="OnTestConnectionClick">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="6">
+                                    <fi:SymbolIcon Symbol="PlugConnected"
+                                                   IconVariant="Regular"
+                                                   FontSize="14" />
+                                    <TextBlock Text="{Binding TestConnectionText}" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Connection Status -->
+                    <Grid IsVisible="{Binding ShowConnectionStatus}"
+                          Margin="0,16,0,0"
+                          ColumnDefinitions="*,Auto">
+                        <Border x:Name="ConnectionStatusBorder"
+                                CornerRadius="6"
+                                Padding="8,4"
+                                VerticalAlignment="Center"
+                                Grid.Column="1">
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                <fi:SymbolIcon x:Name="ConnectionStatusIcon"
+                                               IconVariant="Filled"
+                                               FontSize="12" />
+                                <TextBlock x:Name="ConnectionStatusText"
+                                           FontSize="12"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Display Settings Section -->
+            <Border Classes="settings-section">
+                <StackPanel>
+                    <StackPanel Classes="section-header">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8">
+                            <fi:SymbolIcon Symbol="Eye"
+                                           IconVariant="Filled"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource PrimaryBrush}" />
+                            <TextBlock Classes="section-title"
+                                       Text="{Binding DisplaySectionTitle}" />
+                        </StackPanel>
+                        <TextBlock Classes="section-description"
+                                   Text="{Binding DisplaySectionDescription}" />
+                    </StackPanel>
+
+                    <!-- Show Requester Setting -->
+                    <Grid Classes="setting-item"
+                          ColumnDefinitions="*,Auto">
+                        <StackPanel Classes="setting-info">
+                            <TextBlock Classes="setting-label"
+                                       Text="{Binding ShowRequesterLabel}" />
+                            <TextBlock Classes="setting-desc"
+                                       Text="{Binding ShowRequesterDescription}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1"
+                                      Classes="setting-toggle"
+                                      IsChecked="{Binding ShowRequester, Mode=TwoWay}" />
+                    </Grid>
+
+                    <!-- Max Display Count Setting -->
+                    <Grid Classes="setting-item"
+                          ColumnDefinitions="*,Auto">
+                        <StackPanel Classes="setting-info">
+                            <TextBlock Classes="setting-label"
+                                       Text="{Binding MaxDisplayCountLabel}" />
+                            <TextBlock Classes="setting-desc"
+                                       Text="{Binding MaxDisplayCountDescription}" />
+                        </StackPanel>
+                        <NumericUpDown Grid.Column="1"
+                                       Classes="setting-number"
+                                       Value="{Binding MaxDisplayCount, Mode=TwoWay}"
+                                       Minimum="1"
+                                       Maximum="50"
+                                       Increment="1"
+                                       FormatString="0" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Refresh Settings Section -->
+            <Border Classes="settings-section">
+                <StackPanel>
+                    <StackPanel Classes="section-header">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8">
+                            <fi:SymbolIcon Symbol="ArrowSync"
+                                           IconVariant="Filled"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource PrimaryBrush}" />
+                            <TextBlock Classes="section-title"
+                                       Text="{Binding RefreshSectionTitle}" />
+                        </StackPanel>
+                        <TextBlock Classes="section-description"
+                                   Text="{Binding RefreshSectionDescription}" />
+                    </StackPanel>
+
+                    <!-- Refresh Interval Setting -->
+                    <Grid Classes="setting-item"
+                          ColumnDefinitions="*,Auto">
+                        <StackPanel Classes="setting-info">
+                            <TextBlock Classes="setting-label"
+                                       Text="{Binding RefreshIntervalLabel}" />
+                            <TextBlock Classes="setting-desc"
+                                       Text="{Binding RefreshIntervalDescription}" />
+                        </StackPanel>
+                        <NumericUpDown Grid.Column="1"
+                                       Classes="setting-number"
+                                       Value="{Binding RefreshIntervalMinutes, Mode=TwoWay}"
+                                       Minimum="1"
+                                       Maximum="1440"
+                                       Increment="5"
+                                       FormatString="0" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="12"
+                        Margin="0,8,0,0">
+                <Button Classes="secondary-button"
+                        Click="OnResetClick">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="6">
+                        <fi:SymbolIcon Symbol="ArrowReset"
+                                       IconVariant="Regular"
+                                       FontSize="14" />
+                        <TextBlock Text="{Binding ResetText}" />
+                    </StackPanel>
+                </Button>
+                <Button Classes="action-button"
+                        Click="OnSaveClick">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="6">
+                        <fi:SymbolIcon Symbol="Save"
+                                       IconVariant="Filled"
+                                       FontSize="14" />
+                        <TextBlock Text="{Binding SaveText}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

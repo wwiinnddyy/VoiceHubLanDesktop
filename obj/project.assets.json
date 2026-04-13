@@ -2002,21 +2002,21 @@
   "project": {
     "version": "0.0.7",
     "restore": {
-      "projectUniqueName": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "projectUniqueName": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
       "projectName": "VoiceHubLanDesktop",
-      "projectPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
+      "projectPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
       "packagesPath": "C:\\Users\\USER154971\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
+      "outputPath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
+        "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\NuGet.Config",
         "C:\\Users\\USER154971\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "c:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
+        "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\packages": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
