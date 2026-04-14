@@ -3,6 +3,8 @@ using LanMountainDesktop.PluginSdk;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VoiceHubLanDesktop.Services;
+using VoiceHubLanDesktop.ViewModels;
+using VoiceHubLanDesktop.Views;
 using VoiceHubLanDesktop.Widgets;
 
 namespace VoiceHubLanDesktop;
@@ -26,41 +28,17 @@ public sealed class Plugin : PluginBase
 
         services.AddSingleton<VoiceHubDataService>();
 
-        // Register settings section using SDK's declarative configuration
-        // Note: Custom View (VoiceHubSettingsView) is ready to use when SDK supports SetCustomView
-        services.AddPluginSettingsSection(
+        // Register ViewModel for settings page
+        services.AddTransient<VoiceHubSettingsViewModel>(provider =>
+        {
+            var settingsService = provider.GetRequiredService<VoiceHubSettingsService>();
+            return new VoiceHubSettingsViewModel(settingsService, localizer);
+        });
+
+        // Register custom settings page with VoiceHubSettingsView (Fluent Avalonia)
+        services.AddPluginSettingsSection<VoiceHubSettingsView>(
             id: "voicehub-settings",
             titleLocalizationKey: "settings.page_title",
-            configure: builder =>
-            {
-                builder.AddText(
-                    key: "apiUrl",
-                    titleLocalizationKey: "settings.api_url",
-                    descriptionLocalizationKey: "settings.api_url_desc",
-                    defaultValue: "https://voicehub.lao-shui.top/api/songs/public");
-
-                builder.AddNumber(
-                    key: "refreshIntervalMinutes",
-                    titleLocalizationKey: "settings.refresh_interval",
-                    descriptionLocalizationKey: "settings.refresh_interval_desc",
-                    defaultValue: 60,
-                    minimum: 1,
-                    maximum: 1440);
-
-                builder.AddToggle(
-                    key: "showRequester",
-                    titleLocalizationKey: "settings.show_requester",
-                    descriptionLocalizationKey: "settings.show_requester_desc",
-                    defaultValue: true);
-
-                builder.AddNumber(
-                    key: "maxDisplayCount",
-                    titleLocalizationKey: "settings.max_display_count",
-                    descriptionLocalizationKey: "settings.max_display_count_desc",
-                    defaultValue: 10,
-                    minimum: 1,
-                    maximum: 50);
-            },
             descriptionLocalizationKey: "plugin.description",
             iconKey: "MusicNote",
             sortOrder: 0);

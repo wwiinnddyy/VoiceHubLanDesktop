@@ -21,9 +21,9 @@
     <PackageReference Include="Avalonia" Version="11.3.12" ExcludeAssets="runtime" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.12" ExcludeAssets="runtime" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.12" ExcludeAssets="runtime" />
-    <PackageReference Include="FluentIcons.Avalonia" Version="2.0.319" ExcludeAssets="runtime" />
-    <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.0.319" ExcludeAssets="runtime" />
-    <PackageReference Include="LanMountainDesktop.PluginSdk" Version="4.0.0" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="FluentIcons.Avalonia" Version="2.0.320" ExcludeAssets="runtime" />
+    <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.0.320" ExcludeAssets="runtime" />
+    <ProjectReference Include="..\LanMountainDesktop\LanMountainDesktop.PluginSdk\LanMountainDesktop.PluginSdk.csproj" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.9" ExcludeAssets="all" />
     <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.9" ExcludeAssets="all" />
     <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.9" ExcludeAssets="all" />
