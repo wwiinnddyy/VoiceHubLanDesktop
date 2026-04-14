@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "JDeQfafZOSQ=",
+  "dgSpecHash": "7AsozOPLjAc=",
   "success": true,
   "projectFilePath": "C:\\Users\\USER154971\\Documents\\GitHub\\VoiceHubLanDesktop\\VoiceHubLanDesktop.csproj",
   "expectedPackageFiles": [
@@ -27,6 +27,8 @@
     "C:\\Users\\USER154971\\.nuget\\packages\\harfbuzzsharp.nativeassets.macos\\8.3.1.1\\harfbuzzsharp.nativeassets.macos.8.3.1.1.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\harfbuzzsharp.nativeassets.webassembly\\8.3.1.1\\harfbuzzsharp.nativeassets.webassembly.8.3.1.1.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\harfbuzzsharp.nativeassets.win32\\8.3.1.1\\harfbuzzsharp.nativeassets.win32.8.3.1.1.nupkg.sha512",
+    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.pluginsdk\\4.0.2\\lanmountaindesktop.pluginsdk.4.0.2.nupkg.sha512",
+    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.shared.contracts\\1.0.0\\lanmountaindesktop.shared.contracts.1.0.0.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\microcom.runtime\\0.11.0\\microcom.runtime.0.11.0.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.0\\microsoft.extensions.configuration.abstractions.10.0.0.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.0\\microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
@@ -41,9 +43,7 @@
     "C:\\Users\\USER154971\\.nuget\\packages\\skiasharp.nativeassets.macos\\2.88.9\\skiasharp.nativeassets.macos.2.88.9.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\skiasharp.nativeassets.webassembly\\2.88.9\\skiasharp.nativeassets.webassembly.2.88.9.nupkg.sha512",
     "C:\\Users\\USER154971\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.9\\skiasharp.nativeassets.win32.2.88.9.nupkg.sha512",
-    "C:\\Users\\USER154971\\.nuget\\packages\\tmds.dbus.protocol\\0.21.2\\tmds.dbus.protocol.0.21.2.nupkg.sha512",
-    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.pluginsdk\\4.0.1\\lanmountaindesktop.pluginsdk.4.0.1.nupkg.sha512",
-    "C:\\Users\\USER154971\\.nuget\\packages\\lanmountaindesktop.shared.contracts\\1.0.0\\lanmountaindesktop.shared.contracts.1.0.0.nupkg.sha512"
+    "C:\\Users\\USER154971\\.nuget\\packages\\tmds.dbus.protocol\\0.21.2\\tmds.dbus.protocol.0.21.2.nupkg.sha512"
   ],
   "logs": [
     {

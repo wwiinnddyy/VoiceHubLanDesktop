@@ -394,6 +394,40 @@
           }
         }
       },
+      "LanMountainDesktop.PluginSdk/4.0.2": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "11.3.12",
+          "FluentAvaloniaUI": "2.5.0",
+          "FluentIcons.Avalonia": "2.0.320",
+          "FluentIcons.Avalonia.Fluent": "2.0.320",
+          "LanMountainDesktop.Shared.Contracts": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.0"
+        },
+        "compile": {
+          "lib/net10.0/LanMountainDesktop.PluginSdk.dll": {}
+        },
+        "runtime": {
+          "lib/net10.0/_._": {}
+        },
+        "build": {
+          "buildTransitive/LanMountainDesktop.PluginSdk.props": {},
+          "buildTransitive/LanMountainDesktop.PluginSdk.targets": {}
+        }
+      },
+      "LanMountainDesktop.Shared.Contracts/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "11.3.12"
+        },
+        "compile": {
+          "lib/net10.0/LanMountainDesktop.Shared.Contracts.dll": {}
+        },
+        "runtime": {
+          "lib/net10.0/_._": {}
+        }
+      },
       "MicroCom.Runtime/0.11.0": {
         "type": "package",
         "compile": {
@@ -639,38 +673,6 @@
         },
         "runtime": {
           "lib/net8.0/_._": {}
-        }
-      },
-      "LanMountainDesktop.PluginSdk/4.0.1": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "dependencies": {
-          "Avalonia": "11.3.12",
-          "FluentAvaloniaUI": "2.5.0",
-          "FluentIcons.Avalonia": "2.0.320",
-          "FluentIcons.Avalonia.Fluent": "2.0.320",
-          "LanMountainDesktop.Shared.Contracts": "1.0.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.0"
-        },
-        "compile": {
-          "bin/placeholder/LanMountainDesktop.PluginSdk.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/_._": {}
-        }
-      },
-      "LanMountainDesktop.Shared.Contracts/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "dependencies": {
-          "Avalonia": "11.3.12"
-        },
-        "compile": {
-          "bin/placeholder/LanMountainDesktop.Shared.Contracts.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/_._": {}
         }
       }
     }
@@ -1300,6 +1302,32 @@
         "runtimes/win-x86/native/libHarfBuzzSharp.dll"
       ]
     },
+    "LanMountainDesktop.PluginSdk/4.0.2": {
+      "sha512": "OX1aT8TeQna5w1FcQzlnuScnCEUQ4oAxmGLqsjbCqhXDBB0kiepHHUG5MwGYYyAeWR2metiTXpvJ7J2JtsE4NA==",
+      "type": "package",
+      "path": "lanmountaindesktop.pluginsdk/4.0.2",
+      "files": [
+        ".nupkg.metadata",
+        "README.md",
+        "buildTransitive/LanMountainDesktop.PluginSdk.props",
+        "buildTransitive/LanMountainDesktop.PluginSdk.targets",
+        "lanmountaindesktop.pluginsdk.4.0.2.nupkg.sha512",
+        "lanmountaindesktop.pluginsdk.nuspec",
+        "lib/net10.0/LanMountainDesktop.PluginSdk.dll"
+      ]
+    },
+    "LanMountainDesktop.Shared.Contracts/1.0.0": {
+      "sha512": "MOKGOtZwN4DXC1fX+mCUpbgWArDQgM+q9Fw9PeiwwZspAwI14xGNz5FuSwmk2qAEb7GdTAwy4YD2Fc/T7tOD9g==",
+      "type": "package",
+      "path": "lanmountaindesktop.shared.contracts/1.0.0",
+      "files": [
+        ".nupkg.metadata",
+        "README.md",
+        "lanmountaindesktop.shared.contracts.1.0.0.nupkg.sha512",
+        "lanmountaindesktop.shared.contracts.nuspec",
+        "lib/net10.0/LanMountainDesktop.Shared.Contracts.dll"
+      ]
+    },
     "MicroCom.Runtime/0.11.0": {
       "sha512": "MEnrZ3UIiH40hjzMDsxrTyi8dtqB5ziv3iBeeU4bXsL/7NLSal9F1lZKpK+tfBRnUoDSdtcW3KufE4yhATOMCA==",
       "type": "package",
@@ -1800,16 +1828,6 @@
         "tmds.dbus.protocol.0.21.2.nupkg.sha512",
         "tmds.dbus.protocol.nuspec"
       ]
-    },
-    "LanMountainDesktop.PluginSdk/4.0.1": {
-      "type": "project",
-      "path": "../LanMountainDesktop/LanMountainDesktop.PluginSdk/LanMountainDesktop.PluginSdk.csproj",
-      "msbuildProject": "../LanMountainDesktop/LanMountainDesktop.PluginSdk/LanMountainDesktop.PluginSdk.csproj"
-    },
-    "LanMountainDesktop.Shared.Contracts/1.0.0": {
-      "type": "project",
-      "path": "../LanMountainDesktop/LanMountainDesktop.Shared.Contracts/LanMountainDesktop.Shared.Contracts.csproj",
-      "msbuildProject": "../LanMountainDesktop/LanMountainDesktop.Shared.Contracts/LanMountainDesktop.Shared.Contracts.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -1825,7 +1843,7 @@
       "HarfBuzzSharp.NativeAssets.WebAssembly >= 8.3.1.1",
       "HarfBuzzSharp.NativeAssets.Win32 >= 8.3.1.1",
       "HarfBuzzSharp.NativeAssets.macOS >= 8.3.1.1",
-      "LanMountainDesktop.PluginSdk >= 4.0.1",
+      "LanMountainDesktop.PluginSdk >= 4.0.2",
       "SkiaSharp.NativeAssets.Linux >= 2.88.9",
       "SkiaSharp.NativeAssets.WebAssembly >= 2.88.9",
       "SkiaSharp.NativeAssets.Win32 >= 2.88.9",
@@ -1858,13 +1876,7 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {
-            "C:\\Users\\USER154971\\Documents\\GitHub\\LanMountainDesktop\\LanMountainDesktop.PluginSdk\\LanMountainDesktop.PluginSdk.csproj": {
-              "projectPath": "C:\\Users\\USER154971\\Documents\\GitHub\\LanMountainDesktop\\LanMountainDesktop.PluginSdk\\LanMountainDesktop.PluginSdk.csproj",
-              "excludeAssets": "runtime",
-              "privateAssets": "all"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
@@ -1937,6 +1949,12 @@
             "include": "None",
             "target": "Package",
             "version": "[8.3.1.1, )"
+          },
+          "LanMountainDesktop.PluginSdk": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[4.0.2, )"
           },
           "SkiaSharp.NativeAssets.Linux": {
             "include": "None",
