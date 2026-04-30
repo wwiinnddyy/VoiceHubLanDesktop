@@ -49,7 +49,7 @@ jobs:
       - name: Clear NuGet cache
         shell: pwsh
         run: |
-          dotnet nuget locals all --clear
+          dotnet nuget locals all --clear || Write-Host "Warning: Failed to clear some NuGet caches, continuing..."
 
       - name: Validate plugin metadata
         shell: pwsh
