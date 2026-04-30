@@ -20,9 +20,9 @@ Download the latest `.laapp` from [Releases](https://github.com/wwiinnddyy/Voice
 ## Release Info
 
 <!-- voicehub-release-info:start -->
-- Current version: 0.0.9
-- Current release tag: v0.0.9
-- Current root package: VoiceHubLanDesktop.0.0.9.laapp
+- Current version: 0.1.0
+- Current release tag: v0.1.0
+- Current root package: VoiceHubLanDesktop.0.1.0.laapp
 - Published assets: .laapp, market-manifest.json, sha256.txt, md5.txt
 <!-- voicehub-release-info:end -->
 
