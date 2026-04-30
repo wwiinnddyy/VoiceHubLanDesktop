@@ -58,6 +58,13 @@ jobs:
             -PluginSdkProjectPath $sdkProject `
             -CoreContractsProjectPath $contractsProject
 
+      - name: Stop dotnet processes
+        shell: pwsh
+        run: |
+          Get-Process -Name "dotnet" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          Get-Process -Name "VBCSCompiler" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 2
+
       - name: Clear NuGet cache
         shell: pwsh
         run: |
