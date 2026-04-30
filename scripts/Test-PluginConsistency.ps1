@@ -48,8 +48,8 @@ if ($csprojVersion -ne $manifestVersion) {
     throw "Version mismatch. csproj=$csprojVersion plugin.json=$manifestVersion"
 }
 
-if ($manifestApiVersion -ne "4.0.0") {
-    throw "API version mismatch. Expected plugin.json apiVersion=4.0.0, actual=$manifestApiVersion"
+if ($manifestApiVersion -ne "5.0.0") {
+    throw "API version mismatch. Expected plugin.json apiVersion=5.0.0, actual=$manifestApiVersion"
 }
 
 $expectedAssetName = "$($manifest.id).$csprojVersion.laapp"
