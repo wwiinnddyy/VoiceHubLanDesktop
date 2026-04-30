@@ -13,11 +13,11 @@
     <SourceRoot Include="C:\Users\USER154971\.nuget\packages\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)avalonia\11.3.12\buildTransitive\Avalonia.props" Condition="Exists('$(NuGetPackageRoot)avalonia\11.3.12\buildTransitive\Avalonia.props')" />
-    <Import Project="$(NuGetPackageRoot)lanmountaindesktop.pluginsdk\4.0.2\buildTransitive\LanMountainDesktop.PluginSdk.props" Condition="Exists('$(NuGetPackageRoot)lanmountaindesktop.pluginsdk\4.0.2\buildTransitive\LanMountainDesktop.PluginSdk.props')" />
+    <Import Project="$(NuGetPackageRoot)avalonia\12.0.1\buildTransitive\Avalonia.props" Condition="Exists('$(NuGetPackageRoot)avalonia\12.0.1\buildTransitive\Avalonia.props')" />
+    <Import Project="$(NuGetPackageRoot)lanmountaindesktop.pluginsdk\5.0.0\buildTransitive\LanMountainDesktop.PluginSdk.props" Condition="Exists('$(NuGetPackageRoot)lanmountaindesktop.pluginsdk\5.0.0\buildTransitive\LanMountainDesktop.PluginSdk.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgAvalonia_BuildServices Condition=" '$(PkgAvalonia_BuildServices)' == '' ">C:\Users\USER154971\.nuget\packages\avalonia.buildservices\11.3.2</PkgAvalonia_BuildServices>
-    <PkgAvalonia Condition=" '$(PkgAvalonia)' == '' ">C:\Users\USER154971\.nuget\packages\avalonia\11.3.12</PkgAvalonia>
+    <PkgAvalonia Condition=" '$(PkgAvalonia)' == '' ">C:\Users\USER154971\.nuget\packages\avalonia\12.0.1</PkgAvalonia>
   </PropertyGroup>
 </Project>

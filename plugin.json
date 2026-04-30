@@ -4,7 +4,7 @@
   "description": "Shows the VoiceHub public playlist in LanMountainDesktop.",
   "author": "LaoShui",
   "version": "0.0.9",
-  "apiVersion": "4.0.0",
+  "apiVersion": "5.0.0",
   "entranceAssembly": "VoiceHubLanDesktop.dll",
   "sharedContracts": []
 }

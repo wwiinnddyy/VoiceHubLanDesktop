@@ -182,17 +182,17 @@ public partial class VoiceHubPlaylistWidget : UserControl
             return false;
         }
 
-        if (ActualThemeVariant == ThemeVariant.Dark)
+        if (ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark)
         {
             return true;
         }
 
-        if (ActualThemeVariant == ThemeVariant.Light)
+        if (ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light)
         {
             return false;
         }
 
-        return Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+        return Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark;
     }
 
     private void OnThemeVariantChanged(object? sender, EventArgs e)

@@ -159,17 +159,17 @@ public partial class VoiceHubSettingsView : SettingsPageBase
 
     private bool ResolveIsDarkMode()
     {
-        if (ActualThemeVariant == ThemeVariant.Dark)
+        if (ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark)
         {
             return true;
         }
 
-        if (ActualThemeVariant == ThemeVariant.Light)
+        if (ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light)
         {
             return false;
         }
 
-        return Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+        return Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark;
     }
 
     private void ApplyTheme()
@@ -186,17 +186,9 @@ public partial class VoiceHubSettingsView : SettingsPageBase
 
     private void ApplyLightTheme()
     {
-        Resources["PrimaryBrush"] = new SolidColorBrush(ThemeColors.Primary);
-        Resources["PrimaryHoverBrush"] = new SolidColorBrush(ThemeColors.PrimaryHover);
+        // Use shared Fluent Avalonia theme resources
         Resources["CardBackgroundBrush"] = new SolidColorBrush(ThemeColors.LightCardBackground);
         Resources["CardBorderBrush"] = new SolidColorBrush(ThemeColors.LightCardBorder);
-        Resources["TextPrimaryBrush"] = new SolidColorBrush(ThemeColors.LightTextPrimary);
-        Resources["TextSecondaryBrush"] = new SolidColorBrush(ThemeColors.LightTextSecondary);
-        Resources["InputBackgroundBrush"] = new SolidColorBrush(ThemeColors.LightInputBackground);
-        Resources["InputBorderBrush"] = new SolidColorBrush(ThemeColors.LightInputBorder);
-        Resources["HoverBackgroundBrush"] = new SolidColorBrush(ThemeColors.LightHoverBackground);
-        Resources["IconBadgeBackgroundBrush"] = new SolidColorBrush(ThemeColors.LightIconBadgeBackground);
-        Resources["IconBadgeBorderBrush"] = new SolidColorBrush(ThemeColors.LightIconBadgeBorder);
         Resources["SuccessBackgroundBrush"] = new SolidColorBrush(ThemeColors.SuccessBackground);
         Resources["SuccessForegroundBrush"] = new SolidColorBrush(ThemeColors.SuccessForeground);
         Resources["ErrorBackgroundBrush"] = new SolidColorBrush(ThemeColors.ErrorBackground);
@@ -205,17 +197,9 @@ public partial class VoiceHubSettingsView : SettingsPageBase
 
     private void ApplyDarkTheme()
     {
-        Resources["PrimaryBrush"] = new SolidColorBrush(ThemeColors.Primary);
-        Resources["PrimaryHoverBrush"] = new SolidColorBrush(ThemeColors.PrimaryHover);
+        // Use shared Fluent Avalonia theme resources
         Resources["CardBackgroundBrush"] = new SolidColorBrush(ThemeColors.DarkCardBackground);
         Resources["CardBorderBrush"] = new SolidColorBrush(ThemeColors.DarkCardBorder);
-        Resources["TextPrimaryBrush"] = new SolidColorBrush(ThemeColors.DarkTextPrimary);
-        Resources["TextSecondaryBrush"] = new SolidColorBrush(ThemeColors.DarkTextSecondary);
-        Resources["InputBackgroundBrush"] = new SolidColorBrush(ThemeColors.DarkInputBackground);
-        Resources["InputBorderBrush"] = new SolidColorBrush(ThemeColors.DarkInputBorder);
-        Resources["HoverBackgroundBrush"] = new SolidColorBrush(ThemeColors.DarkHoverBackground);
-        Resources["IconBadgeBackgroundBrush"] = new SolidColorBrush(ThemeColors.DarkIconBadgeBackground);
-        Resources["IconBadgeBorderBrush"] = new SolidColorBrush(ThemeColors.DarkIconBadgeBorder);
         Resources["SuccessBackgroundBrush"] = new SolidColorBrush(ThemeColors.DarkSuccessBackground);
         Resources["SuccessForegroundBrush"] = new SolidColorBrush(ThemeColors.SuccessForeground);
         Resources["ErrorBackgroundBrush"] = new SolidColorBrush(ThemeColors.DarkErrorBackground);
