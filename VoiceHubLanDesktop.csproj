@@ -3,40 +3,18 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
     <EnableDynamicLoading>true</EnableDynamicLoading>
-    <OutputPath>bin\$(Configuration)\$(TargetFramework)\content\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <LanMountainPluginEnablePackaging>true</LanMountainPluginEnablePackaging>
-    <LanMountainPluginBuildOutputDirectory>$(OutputPath)</LanMountainPluginBuildOutputDirectory>
-    <LanMountainPluginPackageVersion>$(Version)</LanMountainPluginPackageVersion>
-    <LanMountainPluginPackageOutputDirectory>$(MSBuildThisFileDirectory)</LanMountainPluginPackageOutputDirectory>
-    <LanMountainPluginPackageFileName>$(AssemblyName).$(LanMountainPluginPackageVersion)$(LanMountainPluginPackageExtension)</LanMountainPluginPackageFileName>
-    <LanMountainPluginPackagePath>$(LanMountainPluginPackageOutputDirectory)$(LanMountainPluginPackageFileName)</LanMountainPluginPackagePath>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Avalonia 12 packages - versions aligned with SDK 5.0 -->
-    <PackageReference Include="Avalonia" Version="12.0.1" ExcludeAssets="runtime" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.1" ExcludeAssets="runtime" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.1" ExcludeAssets="runtime" />
-    <PackageReference Include="FluentIcons.Avalonia" Version="2.1.325" ExcludeAssets="runtime" />
-    <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.0.325" ExcludeAssets="runtime" />
-    <PackageReference Include="LanMountainDesktop.PluginSdk" Version="5.0.0" ExcludeAssets="runtime" PrivateAssets="all" />
-    <!-- Native assets - versions aligned with Avalonia 12 -->
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.3-preview.1.1" ExcludeAssets="all" />
-    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="3.119.3-preview.1.1" ExcludeAssets="all" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="3.119.3-preview.1.1" ExcludeAssets="all" />
-    <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="3.119.3-preview.1.1" ExcludeAssets="all" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.3" ExcludeAssets="all" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" Version="8.3.1.3" ExcludeAssets="all" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="8.3.1.3" ExcludeAssets="all" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.1.3" ExcludeAssets="all" />
-    <PackageReference Include="Avalonia.Angle.Windows.Natives" Version="2.1.25547.20250602" ExcludeAssets="all" />
-    <PackageReference Include="Avalonia.Native" Version="12.0.1" ExcludeAssets="all" />
-    <None Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="Avalonia" Version="11.2.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" ExcludeAssets="runtime" />
+    <PackageReference Include="FluentAvalonia.FluentUI" Version="2.2.0" ExcludeAssets="runtime" />
+    <PackageReference Include="LanMountainDesktop.AirAppSdk" Version="1.0.0" ExcludeAssets="runtime" PrivateAssets="all" />
+    <None Include="airapp.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Localization\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

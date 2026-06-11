@@ -13,21 +13,17 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using FluentIcons.Avalonia;
-using FluentIcons.Common;
-using LanMountainDesktop.PluginSdk;
+using FluentAvalonia.UI.Controls;
+using LanMountainDesktop.AirAppSdk;
 using VoiceHubLanDesktop.Models;
 using VoiceHubLanDesktop.Services;
 
 namespace VoiceHubLanDesktop.Widgets;
 
-public partial class VoiceHubPlaylistWidget : UserControl
+public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
 {
-    private PluginDesktopComponentContext? _context;
-    private PluginLocalizer? _localizer;
     private VoiceHubSettingsService? _settingsService;
     private VoiceHubDataService? _dataService;
-    private IPluginMessageBus? _messageBus;
 
     private readonly HttpClient _httpClient = new();
     private CancellationTokenSource? _cancellationTokenSource;
@@ -38,7 +34,6 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private DateTime? _displayDate;
     private bool _isDarkMode;
 
-    private readonly List<IDisposable> _subscriptions = [];
     private readonly Dictionary<string, Bitmap> _coverCache = [];
 
     private bool _isDesignMode;
@@ -78,15 +73,11 @@ public partial class VoiceHubPlaylistWidget : UserControl
     }
 
     public VoiceHubPlaylistWidget(
-        PluginDesktopComponentContext context,
         VoiceHubSettingsService settingsService,
         VoiceHubDataService dataService) : this()
     {
-        _context = context;
-        _localizer = PluginLocalizer.Create(context);
         _settingsService = settingsService;
         _dataService = dataService;
-        _messageBus = context.GetService<IPluginMessageBus>();
 
         _httpClient.Timeout = TimeSpan.FromSeconds(10);
 
@@ -98,17 +89,52 @@ public partial class VoiceHubPlaylistWidget : UserControl
         _refreshTimer.Tick += async (_, _) => await RefreshAsync();
 
         _isDarkMode = ResolveIsDarkMode();
-        ApplyTheme();
 
         SetState(ComponentState.Loading);
 
-        AttachedToVisualTree += OnAttachedToVisualTree;
-        DetachedFromVisualTree += OnDetachedFromVisualTree;
         SizeChanged += OnSizeChanged;
         ActualThemeVariantChanged += OnThemeVariantChanged;
 
         _settingsService.SettingsChanged += OnSettingsChanged;
-        _context.Appearance.Changed += OnAppearanceChanged;
+    }
+
+    protected override void OnAttachedCore()
+    {
+        if (_isDesignMode) return;
+
+        _isDarkMode = ResolveIsDarkMode();
+        ApplyTheme();
+        _ = RefreshAsync();
+        _refreshTimer?.Start();
+    }
+
+    protected override void OnDetachedCore()
+    {
+        if (_isDesignMode) return;
+
+        _refreshTimer?.Stop();
+        _cancellationTokenSource?.Cancel();
+
+        foreach (var bitmap in _coverCache.Values)
+        {
+            bitmap.Dispose();
+        }
+        _coverCache.Clear();
+    }
+
+    protected override void OnAppearanceChangedCore(AirAppAppearanceSnapshot snapshot)
+    {
+        var newIsDarkMode = snapshot.IsDarkMode;
+        if (_isDarkMode != newIsDarkMode)
+        {
+            _isDarkMode = newIsDarkMode;
+            Dispatcher.UIThread.Post(() =>
+            {
+                ApplyTheme();
+                ApplyScale();
+                UpdateSongsPanel();
+            });
+        }
     }
 
     private void SetupDesignTimePreview()
@@ -166,18 +192,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private bool ResolveIsDarkMode()
     {
-        if (_isDesignMode || _context is null)
-        {
-            return false;
-        }
-
-        var themeVariant = _context.Appearance.Snapshot.ThemeVariant;
-        if (string.Equals(themeVariant, "Dark", StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        if (string.Equals(themeVariant, "Light", StringComparison.OrdinalIgnoreCase))
+        if (_isDesignMode)
         {
             return false;
         }
@@ -210,9 +225,9 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private void ApplyTheme()
     {
-        if (_isDesignMode || _context is null) return;
+        if (_isDesignMode) return;
 
-        var cornerRadius = _context.CornerRadiusTokens.Component;
+        var cornerRadius = 12.0;
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);
         CardBorder.CornerRadius = new CornerRadius(cornerRadius);
@@ -545,7 +560,7 @@ public partial class VoiceHubPlaylistWidget : UserControl
 
     private Border CreateSongCard(Song song, double titleSize, double detailSize, double basis, VoiceHubSettings? settings = null)
     {
-        var cardCornerRadius = _isDesignMode ? 10d : _context?.CornerRadiusTokens.Sm ?? 14d;
+        var cardCornerRadius = _isDesignMode ? 10d : 14d;
 
         var surfaceColor = _isDarkMode ? Color.Parse("#252B33") : Color.Parse("#F8F8F8");
         var textColor = _isDarkMode ? ThemeColors.DarkText : ThemeColors.LightText;
@@ -563,10 +578,9 @@ public partial class VoiceHubPlaylistWidget : UserControl
             VerticalAlignment = VerticalAlignment.Center
         };
 
-        var fallbackIcon = new SymbolIcon
+        var fallbackIcon = new FontIcon
         {
-            Symbol = Symbol.MusicNote1,
-            IconVariant = IconVariant.Regular,
+            Glyph = "",
             FontSize = coverSize * 0.45,
             Foreground = new SolidColorBrush(_isDarkMode ? ThemeColors.DarkTextSecondary : ThemeColors.LightTextSecondary),
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -619,10 +633,9 @@ public partial class VoiceHubPlaylistWidget : UserControl
             IsVisible = song.VoteCount > 0
         };
 
-        var voteIcon = new SymbolIcon
+        var voteIcon = new FontIcon
         {
-            Symbol = Symbol.Fire,
-            IconVariant = IconVariant.Filled,
+            Glyph = "",
             FontSize = detailSize * 1.1,
             Foreground = new SolidColorBrush(ThemeColors.Warning),
             VerticalAlignment = VerticalAlignment.Center
@@ -703,8 +716,8 @@ public partial class VoiceHubPlaylistWidget : UserControl
     private void ApplyScale()
     {
         var basis = GetLayoutBasis();
-        var cornerRadius = _isDesignMode ? 24d : _context?.CornerRadiusTokens.Component ?? 24d;
-        var smRadius = _isDesignMode ? 10d : _context?.CornerRadiusTokens.Sm ?? 14d;
+        var cornerRadius = _isDesignMode ? 24d : 24d;
+        var smRadius = _isDesignMode ? 10d : 14d;
 
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);
@@ -751,19 +764,20 @@ public partial class VoiceHubPlaylistWidget : UserControl
             return Math.Min(Bounds.Width, Bounds.Height);
         }
 
-        var width = Bounds.Width > 1 ? Bounds.Width : _context!.CellSize * 3;
-        var height = Bounds.Height > 1 ? Bounds.Height : _context!.CellSize * 4;
-        return Math.Max(_context!.CellSize * 3, Math.Min(width, height));
+        var cellSize = 100.0;
+        var width = Bounds.Width > 1 ? Bounds.Width : cellSize * 3;
+        var height = Bounds.Height > 1 ? Bounds.Height : cellSize * 4;
+        return Math.Max(cellSize * 3, Math.Min(width, height));
     }
 
     private string T(string key, string fallback)
     {
-        return _localizer?.GetString(key, fallback) ?? fallback;
+        return fallback;
     }
 
     private string T(string key, string fallback, params object[] args)
     {
-        return _localizer?.Format(key, fallback, args) ?? string.Format(fallback, args);
+        return string.Format(fallback, args);
     }
 }
 

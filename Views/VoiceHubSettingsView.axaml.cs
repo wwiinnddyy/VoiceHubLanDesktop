@@ -4,21 +4,19 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Styling;
-using FluentIcons.Avalonia;
-using FluentIcons.Common;
-using LanMountainDesktop.PluginSdk;
+using FluentAvalonia.UI.Controls;
 using VoiceHubLanDesktop.ViewModels;
 
 namespace VoiceHubLanDesktop.Views;
 
-public partial class VoiceHubSettingsView : SettingsPageBase
+public partial class VoiceHubSettingsView : UserControl
 {
     private VoiceHubSettingsViewModel? _viewModel;
     private bool _isDarkMode;
 
     // Controls
     private Border? _connectionStatusBorder;
-    private SymbolIcon? _connectionStatusIcon;
+    private FontIcon? _connectionStatusIcon;
     private TextBlock? _connectionStatusText;
 
     private static class ThemeColors
@@ -65,7 +63,7 @@ public partial class VoiceHubSettingsView : SettingsPageBase
 
         // Get references to named controls
         _connectionStatusBorder = this.FindControl<Border>("ConnectionStatusBorder");
-        _connectionStatusIcon = this.FindControl<SymbolIcon>("ConnectionStatusIcon");
+        _connectionStatusIcon = this.FindControl<FontIcon>("ConnectionStatusIcon");
         _connectionStatusText = this.FindControl<TextBlock>("ConnectionStatusText");
 
         _isDarkMode = ResolveIsDarkMode();
@@ -77,7 +75,6 @@ public partial class VoiceHubSettingsView : SettingsPageBase
 
     public override void OnNavigatedTo(object? parameter)
     {
-        base.OnNavigatedTo(parameter);
         // Refresh settings when navigated to
         if (DataContext is VoiceHubSettingsViewModel vm)
         {
@@ -128,7 +125,12 @@ public partial class VoiceHubSettingsView : SettingsPageBase
 
         _connectionStatusBorder.IsVisible = true;
         _connectionStatusText.Text = _viewModel.ConnectionStatusText;
-        _connectionStatusIcon.Symbol = _viewModel.ConnectionStatusIcon;
+        _connectionStatusIcon.Glyph = _viewModel.ConnectionStatusIcon switch
+        {
+            FluentIcons.Common.Symbol.CheckmarkCircle => "",
+            FluentIcons.Common.Symbol.DismissCircle => "",
+            _ => ""
+        };
 
         if (_viewModel.IsConnectionSuccess)
         {

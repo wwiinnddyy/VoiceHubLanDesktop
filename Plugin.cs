@@ -1,5 +1,5 @@
 using System.IO;
-using LanMountainDesktop.PluginSdk;
+using LanMountainDesktop.AirAppSdk;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VoiceHubLanDesktop.Services;
@@ -9,74 +9,46 @@ using VoiceHubLanDesktop.Widgets;
 
 namespace VoiceHubLanDesktop;
 
-[PluginEntrance]
-public sealed class Plugin : PluginBase
+[AirAppEntrance]
+public sealed class Plugin : AirAppBase
 {
     public override void Initialize(HostBuilderContext context, IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(services);
 
-        var localizer = CreateLocalizer(context);
-
         services.AddSingleton(provider =>
         {
-            var runtimeContext = provider.GetRequiredService<IPluginRuntimeContext>();
+            var runtimeContext = provider.GetRequiredService<IAirAppRuntimeContext>();
             Directory.CreateDirectory(runtimeContext.DataDirectory);
             return new VoiceHubSettingsService(runtimeContext.DataDirectory);
         });
 
         services.AddSingleton<VoiceHubDataService>();
+        services.AddTransient<VoiceHubSettingsViewModel>();
 
-        // Register ViewModel for settings page
-        services.AddTransient<VoiceHubSettingsViewModel>(provider =>
-        {
-            var settingsService = provider.GetRequiredService<VoiceHubSettingsService>();
-            return new VoiceHubSettingsViewModel(settingsService, localizer);
-        });
-
-        // Register custom settings page with VoiceHubSettingsView (Fluent Avalonia)
-        services.AddPluginSettingsSection<VoiceHubSettingsView>(
-            id: "voicehub-settings",
-            titleLocalizationKey: "settings.page_title",
-            descriptionLocalizationKey: "plugin.description",
-            iconKey: "MusicNote",
-            sortOrder: 0);
-
-        services.AddPluginDesktopComponent<VoiceHubPlaylistWidget>(
-            CreatePlaylistComponentOptions(localizer));
+        services.AddAirAppComponent<VoiceHubPlaylistWidget>(
+            "voicehub-playlist",
+            "声动校园歌单",
+            options =>
+            {
+                options.Description = "显示声动校园广播点歌单";
+                options.DefaultWidth = 3;
+                options.DefaultHeight = 4;
+                options.ResizeMode = AirAppComponentResizeMode.Both;
+                options.Category = "娱乐";
+                options.IconKey = "MusicNote";
+            });
     }
 
-    private static PluginLocalizer CreateLocalizer(HostBuilderContext context)
+    public override Task OnStartedAsync(IAirAppRuntimeContext context)
     {
-        var pluginDirectory = context.Properties.TryGetValue("LanMountainDesktop.PluginDirectory", out var directoryValue) &&
-                              directoryValue is string resolvedPluginDirectory &&
-                              !string.IsNullOrWhiteSpace(resolvedPluginDirectory)
-            ? resolvedPluginDirectory
-            : AppContext.BaseDirectory;
-
-        var properties = context.Properties
-            .Where(pair => pair.Key is string)
-            .ToDictionary(pair => (string)pair.Key, pair => (object?)pair.Value, System.StringComparer.OrdinalIgnoreCase);
-
-        return new PluginLocalizer(pluginDirectory, PluginLocalizer.ResolveLanguageCode(properties));
+        context.Logger.Info("VoiceHub AirApp started successfully!");
+        return Task.CompletedTask;
     }
 
-    private static PluginDesktopComponentOptions CreatePlaylistComponentOptions(PluginLocalizer localizer)
+    public override Task OnStoppingAsync()
     {
-        return new PluginDesktopComponentOptions
-        {
-            ComponentId = "VoiceHubLanDesktop.Playlist",
-            DisplayName = localizer.GetString("widget.display_name", "声动校园歌单"),
-            DisplayNameLocalizationKey = "widget.display_name",
-            IconKey = "MusicNote",
-            Category = localizer.GetString("widget.category", "声动校园"),
-            MinWidthCells = 3,
-            MinHeightCells = 4,
-            AllowDesktopPlacement = true,
-            AllowStatusBarPlacement = false,
-            ResizeMode = PluginDesktopComponentResizeMode.Proportional,
-            CornerRadiusPreset = PluginCornerRadiusPreset.Default
-        };
+        return Task.CompletedTask;
     }
 }
