@@ -18,20 +18,20 @@ jobs:
 
     steps:
       - name: Checkout LanMountainDesktop
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: wwiinnddyy/LanMountainDesktop
           fetch-depth: 0
           path: LanMountainDesktop
 
       - name: Checkout plugin
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           path: VoiceHubLanDesktop
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -80,7 +80,7 @@ jobs:
             -OutputPath .\VoiceHubLanDesktop\artifacts\airappmarket-sync.json
 
       - name: Upload CI artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: voicehub-plugin-ci
           path: |
