@@ -4,19 +4,20 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Styling;
-using FluentAvalonia.UI.Controls;
+using FluentIcons.Avalonia;
+using LanMountainDesktop.PluginSdk;
 using VoiceHubLanDesktop.ViewModels;
 
 namespace VoiceHubLanDesktop.Views;
 
-public partial class VoiceHubSettingsView : UserControl
+public partial class VoiceHubSettingsView : SettingsPageBase
 {
     private VoiceHubSettingsViewModel? _viewModel;
     private bool _isDarkMode;
 
     // Controls
     private Border? _connectionStatusBorder;
-    private FontIcon? _connectionStatusIcon;
+    private SymbolIcon? _connectionStatusIcon;
     private TextBlock? _connectionStatusText;
 
     private static class ThemeColors
@@ -63,7 +64,7 @@ public partial class VoiceHubSettingsView : UserControl
 
         // Get references to named controls
         _connectionStatusBorder = this.FindControl<Border>("ConnectionStatusBorder");
-        _connectionStatusIcon = this.FindControl<FontIcon>("ConnectionStatusIcon");
+        _connectionStatusIcon = this.FindControl<SymbolIcon>("ConnectionStatusIcon");
         _connectionStatusText = this.FindControl<TextBlock>("ConnectionStatusText");
 
         _isDarkMode = ResolveIsDarkMode();
@@ -71,6 +72,11 @@ public partial class VoiceHubSettingsView : UserControl
 
         DataContextChanged += OnDataContextChanged;
         ActualThemeVariantChanged += OnThemeVariantChanged;
+    }
+
+    public VoiceHubSettingsView(VoiceHubSettingsViewModel viewModel) : this()
+    {
+        DataContext = viewModel;
     }
 
     public override void OnNavigatedTo(object? parameter)
@@ -125,12 +131,7 @@ public partial class VoiceHubSettingsView : UserControl
 
         _connectionStatusBorder.IsVisible = true;
         _connectionStatusText.Text = _viewModel.ConnectionStatusText;
-        _connectionStatusIcon.Glyph = _viewModel.ConnectionStatusIcon switch
-        {
-            FluentIcons.Common.Symbol.CheckmarkCircle => "",
-            FluentIcons.Common.Symbol.DismissCircle => "",
-            _ => ""
-        };
+        _connectionStatusIcon.Symbol = _viewModel.ConnectionStatusIcon;
 
         if (_viewModel.IsConnectionSuccess)
         {

@@ -116,9 +116,17 @@ jobs:
           "release_tag=v$version" >> $env:GITHUB_OUTPUT
           "asset_name=$assetName" >> $env:GITHUB_OUTPUT
 
+      - name: Validate plugin metadata
+        shell: pwsh
+        run: .\VoiceHubLanDesktop\scripts\Test-PluginConsistency.ps1 -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path
+
+      - name: Restore plugin
+        shell: pwsh
+        run: dotnet restore .\VoiceHubLanDesktop\VoiceHubLanDesktop.csproj --configfile .\VoiceHubLanDesktop\NuGet.config --force --no-cache -v minimal
+
       - name: Build plugin package
         shell: pwsh
-        run: dotnet build .\VoiceHubLanDesktop\VoiceHubLanDesktop.csproj -c Release -v minimal
+        run: dotnet build .\VoiceHubLanDesktop\VoiceHubLanDesktop.csproj -c Release --no-restore -v minimal
 
       - name: Validate built package
         shell: pwsh
@@ -224,6 +232,14 @@ jobs:
             -Version "${{ steps.metadata.outputs.version }}" `
             -ReleaseTag "${{ steps.metadata.outputs.release_tag }}" `
             -OutputPath .\VoiceHubLanDesktop\artifacts\market-manifest.json
+
+      - name: Validate market/package contract
+        shell: pwsh
+        run: |
+          .\VoiceHubLanDesktop\scripts\Test-PluginConsistency.ps1 `
+            -RepositoryRoot (Resolve-Path ".\VoiceHubLanDesktop").Path `
+            -PackagePath ".\VoiceHubLanDesktop\artifacts\verified\${{ steps.metadata.outputs.asset_name }}" `
+            -MarketManifestPath ".\VoiceHubLanDesktop\artifacts\market-manifest.json"
 
       - name: Publish verified market manifest
         uses: softprops/action-gh-release@v2

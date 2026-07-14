@@ -1,5 +1,4 @@
-using System.IO;
-using LanMountainDesktop.AirAppSdk;
+using LanMountainDesktop.PluginSdk;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VoiceHubLanDesktop.Services;
@@ -9,8 +8,8 @@ using VoiceHubLanDesktop.Widgets;
 
 namespace VoiceHubLanDesktop;
 
-[AirAppEntrance]
-public sealed class Plugin : AirAppBase
+[PluginEntrance]
+public sealed class Plugin : PluginBase
 {
     public override void Initialize(HostBuilderContext context, IServiceCollection services)
     {
@@ -19,7 +18,7 @@ public sealed class Plugin : AirAppBase
 
         services.AddSingleton(provider =>
         {
-            var runtimeContext = provider.GetRequiredService<IAirAppRuntimeContext>();
+            var runtimeContext = provider.GetRequiredService<IPluginRuntimeContext>();
             Directory.CreateDirectory(runtimeContext.DataDirectory);
             return new VoiceHubSettingsService(runtimeContext.DataDirectory);
         });
@@ -27,28 +26,26 @@ public sealed class Plugin : AirAppBase
         services.AddSingleton<VoiceHubDataService>();
         services.AddTransient<VoiceHubSettingsViewModel>();
 
-        services.AddAirAppComponent<VoiceHubPlaylistWidget>(
-            "voicehub-playlist",
-            "声动校园歌单",
-            options =>
-            {
-                options.Description = "显示声动校园广播点歌单";
-                options.DefaultWidth = 3;
-                options.DefaultHeight = 4;
-                options.ResizeMode = AirAppComponentResizeMode.Both;
-                options.Category = "娱乐";
-                options.IconKey = "MusicNote";
-            });
-    }
+        services.AddPluginSettingsSection<VoiceHubSettingsView>(
+            id: "connection",
+            titleLocalizationKey: "VoiceHub settings",
+            descriptionLocalizationKey: "Connection, refresh, and playlist display settings.",
+            iconKey: "MusicNote2",
+            sortOrder: 0);
 
-    public override Task OnStartedAsync(IAirAppRuntimeContext context)
-    {
-        context.Logger.Info("VoiceHub AirApp started successfully!");
-        return Task.CompletedTask;
-    }
-
-    public override Task OnStoppingAsync()
-    {
-        return Task.CompletedTask;
+        services.AddPluginDesktopComponent<VoiceHubPlaylistWidget>(new PluginDesktopComponentOptions
+        {
+            ComponentId = "voicehub-playlist",
+            DisplayName = "VoiceHub campus playlist",
+            Description = "Displays the public VoiceHub broadcast playlist.",
+            Category = "Entertainment",
+            IconKey = "MusicNote2",
+            MinWidthCells = 3,
+            MinHeightCells = 4,
+            AllowDesktopPlacement = true,
+            AllowStatusBarPlacement = false,
+            ResizeMode = PluginDesktopComponentResizeMode.Free,
+            CornerRadiusPreset = PluginCornerRadiusPreset.Component
+        });
     }
 }

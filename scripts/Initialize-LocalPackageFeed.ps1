@@ -51,4 +51,15 @@ if (Test-Path $sharedIPCProjectPath) {
 
 Pack-Project -ProjectPath $PluginSdkProjectPath -OutputDirectory $FeedPath
 
+$resolvedFeedPath = [System.IO.Path]::GetFullPath((Resolve-Path $FeedPath).Path)
+$repositoryRoot = [System.IO.Path]::GetFullPath((Split-Path -Parent $resolvedFeedPath))
+$localPackagesRoot = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot ".nuget\packages"))
+$repositoryPrefix = $repositoryRoot.TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
+if (-not $localPackagesRoot.StartsWith($repositoryPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to clean NuGet cache outside repository root: '$localPackagesRoot'."
+}
+if (Test-Path $localPackagesRoot) {
+    Remove-Item -LiteralPath $localPackagesRoot -Recurse -Force
+}
+
 Write-Host "Local package feed initialized at '$FeedPath'."

@@ -137,6 +137,10 @@ if ($manifestVersion -ne $Version) {
     throw "Requested version '$Version' does not match package manifest version '$manifestVersion'."
 }
 
+if ($ReleaseTag -ne "v$manifestVersion") {
+    throw "Release tag '$ReleaseTag' does not match package manifest version '$manifestVersion'."
+}
+
 if ([string]::IsNullOrWhiteSpace($entranceAssembly)) {
     $entranceAssembly = "$manifestId.dll"
 }
@@ -153,8 +157,11 @@ if ([string]::IsNullOrWhiteSpace($repositoryUrl)) {
 $repo = Get-RepositoryInfo -RepositoryUrl $repositoryUrl
 $releaseAssetUrl = "https://github.com/$($repo.Owner)/$($repo.Name)/releases/download/$ReleaseTag/$assetName"
 $rawFallbackUrl = "https://raw.githubusercontent.com/$($repo.Owner)/$($repo.Name)/main/$assetName"
-$workspaceLocalUrl = "./$assetName"
+$workspaceLocalPath = "workspace://$($repo.Name)/$assetName"
 $minHostVersion = [string](Get-PropertyValue $template "minHostVersion")
+if ($minHostVersion -ne "0.8.6") {
+    throw "PluginSdk v5 market manifests require minHostVersion=0.8.6, actual='$minHostVersion'."
+}
 $iconUrl = [string](Get-PropertyValue $template "iconUrl")
 $projectUrl = [string](Get-PropertyValue $template "projectUrl")
 $readmeUrl = [string](Get-PropertyValue $template "readmeUrl")
@@ -182,20 +189,29 @@ $packageSources = @(
     [pscustomobject][ordered]@{
         kind = "releaseAsset"
         url = $releaseAssetUrl
+        assetName = $assetName
         sha256 = $sha256
-        packageSizeBytes = $packageSizeBytes
+        sizeBytes = $packageSizeBytes
+        releaseTag = $ReleaseTag
+        priority = 0
     },
     [pscustomobject][ordered]@{
         kind = "rawFallback"
         url = $rawFallbackUrl
+        assetName = $assetName
         sha256 = $sha256
-        packageSizeBytes = $packageSizeBytes
+        sizeBytes = $packageSizeBytes
+        releaseTag = $ReleaseTag
+        priority = 1
     },
     [pscustomobject][ordered]@{
         kind = "workspaceLocal"
-        url = $workspaceLocalUrl
+        path = $workspaceLocalPath
+        assetName = $assetName
         sha256 = $sha256
-        packageSizeBytes = $packageSizeBytes
+        sizeBytes = $packageSizeBytes
+        releaseTag = $ReleaseTag
+        priority = 2
     }
 )
 
@@ -211,9 +227,16 @@ $manifestObject = [pscustomobject][ordered]@{
         apiVersion = $manifestApiVersion
         entranceAssembly = $entranceAssembly
         sharedContracts = $sharedContracts
+        runtime = Get-PropertyValue $manifest "runtime"
+        tags = $tags
+        releaseTag = $ReleaseTag
+        releaseAssetName = $assetName
+        releaseNotes = $releaseNotes
     }
     compatibility = [pscustomobject][ordered]@{
         minHostVersion = $minHostVersion
+        apiVersion = $manifestApiVersion
+        sharedContracts = $sharedContracts
     }
     repository = [pscustomobject][ordered]@{
         iconUrl = $iconUrl
@@ -227,12 +250,18 @@ $manifestObject = [pscustomobject][ordered]@{
     publication = [pscustomobject][ordered]@{
         releaseTag = $ReleaseTag
         releaseAssetName = $assetName
-        publishedAt = $generatedAt
-        updatedAt = $generatedAt
+        downloadUrl = $releaseAssetUrl
         packageSizeBytes = $packageSizeBytes
         sha256 = $sha256
         md5 = $md5
         packageSources = $packageSources
+    }
+    capabilities = [pscustomobject][ordered]@{
+        sharedContracts = $sharedContracts
+        desktopComponents = @("voicehub-playlist")
+        settingsSections = @("connection")
+        exports = @()
+        messageTypes = @()
     }
 }
 

@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<lm:SettingsPageBase xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,7 +11,7 @@
              x:Class="VoiceHubLanDesktop.Views.VoiceHubSettingsView"
              x:DataType="vm:VoiceHubSettingsViewModel">
 
-    <UserControl.Styles>
+    <lm:SettingsPageBase.Styles>
         <!-- Section Card Style -->
         <Style Selector="Border.settings-section">
             <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
@@ -156,7 +156,7 @@
         <Style Selector="Border.status-badge.error TextBlock.status-text">
             <Setter Property="Foreground" Value="{DynamicResource ErrorForegroundBrush}" />
         </Style>
-    </UserControl.Styles>
+    </lm:SettingsPageBase.Styles>
 
     <ScrollViewer Background="Transparent"
                   HorizontalScrollBarVisibility="Disabled"
@@ -352,4 +352,4 @@
 
         </StackPanel>
     </ScrollViewer>
-</UserControl>
+</lm:SettingsPageBase>

@@ -20,9 +20,9 @@ Download the latest `.laapp` from [Releases](https://github.com/wwiinnddyy/Voice
 ## Release Info
 
 <!-- voicehub-release-info:start -->
-- Current version: 0.1.0
-- Current release tag: v0.1.0
-- Current root package: VoiceHubLanDesktop.0.1.0.laapp
+- Current version: 1.0.0
+- Current release tag: v1.0.0
+- Current root package: VoiceHubLanDesktop.1.0.0.laapp
 - Published assets: .laapp, market-manifest.json, sha256.txt, md5.txt
 <!-- voicehub-release-info:end -->
 
@@ -36,16 +36,14 @@ Download the latest `.laapp` from [Releases](https://github.com/wwiinnddyy/Voice
 ### Requirements
 
 - .NET 10.0 SDK
-- LanMountainDesktop.PluginSdk 4.0.0
+- LanMountainDesktop.PluginSdk 5.0.0 (first supported by LanMountainDesktop 0.8.6)
+- Restore uses an isolated `.nuget/packages` cache to prevent stale SDK 5.0.0 content from the machine-wide NuGet cache.
 
 ### Local build
 
 ```powershell
-# Initialize the local package feed
-.\scripts\Initialize-LocalPackageFeed.ps1
-
-# Build the project
-dotnet build -c Release
+# Initialize the local feed, restore, build, package, and validate
+.\scripts\build-local.ps1 -LanMountainDesktopPath ..\LanMountainDesktop
 ```
 
 ### Validation

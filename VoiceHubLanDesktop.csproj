@@ -6,17 +6,28 @@
     <Version>1.0.0</Version>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <OutputPath>bin\$(Configuration)\$(TargetFramework)\content\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <LanMountainPluginBuildOutputDirectory>$(OutputPath)</LanMountainPluginBuildOutputDirectory>
+    <LanMountainPluginPackageVersion>$(Version)</LanMountainPluginPackageVersion>
+    <LanMountainPluginPackageOutputDirectory>$(MSBuildThisFileDirectory)</LanMountainPluginPackageOutputDirectory>
+    <LanMountainPluginPackageFileName>VoiceHubLanDesktop.$(LanMountainPluginPackageVersion)$(LanMountainPluginPackageExtension)</LanMountainPluginPackageFileName>
+    <LanMountainPluginPackagePath>$(LanMountainPluginPackageOutputDirectory)$(LanMountainPluginPackageFileName)</LanMountainPluginPackagePath>
+    <RestorePackagesPath>$(MSBuildProjectDirectory)\.nuget\packages</RestorePackagesPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.0" ExcludeAssets="runtime" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.0" ExcludeAssets="runtime" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" ExcludeAssets="runtime" />
-    <PackageReference Include="FluentAvalonia.FluentUI" Version="2.2.0" ExcludeAssets="runtime" />
-    <PackageReference Include="LanMountainDesktop.AirAppSdk" Version="1.0.0" ExcludeAssets="runtime" PrivateAssets="all" />
-    <None Include="airapp.json" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="LanMountainDesktop.PluginSdk" Version="5.0.0" ExcludeAssets="runtime;native" PrivateAssets="all" />
+    <None Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Localization\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <Target Name="CleanPluginOutputBeforeBuild"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+    <RemoveDir Directories="$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)\content" />
+  </Target>
 
 </Project>

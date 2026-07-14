@@ -13,15 +13,15 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using FluentAvalonia.UI.Controls;
-using LanMountainDesktop.AirAppSdk;
+using LanMountainDesktop.PluginSdk;
 using VoiceHubLanDesktop.Models;
 using VoiceHubLanDesktop.Services;
 
 namespace VoiceHubLanDesktop.Widgets;
 
-public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
+public partial class VoiceHubPlaylistWidget : UserControl
 {
+    private PluginDesktopComponentContext? _context;
     private VoiceHubSettingsService? _settingsService;
     private VoiceHubDataService? _dataService;
 
@@ -70,12 +70,19 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
         {
             SetupDesignTimePreview();
         }
+
+        AttachedToVisualTree += OnAttachedToVisualTree;
+        DetachedFromVisualTree += OnDetachedFromVisualTree;
     }
 
     public VoiceHubPlaylistWidget(
+        PluginDesktopComponentContext context,
         VoiceHubSettingsService settingsService,
         VoiceHubDataService dataService) : this()
     {
+        ArgumentNullException.ThrowIfNull(context);
+
+        _context = context;
         _settingsService = settingsService;
         _dataService = dataService;
 
@@ -95,46 +102,6 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
         SizeChanged += OnSizeChanged;
         ActualThemeVariantChanged += OnThemeVariantChanged;
 
-        _settingsService.SettingsChanged += OnSettingsChanged;
-    }
-
-    protected override void OnAttachedCore()
-    {
-        if (_isDesignMode) return;
-
-        _isDarkMode = ResolveIsDarkMode();
-        ApplyTheme();
-        _ = RefreshAsync();
-        _refreshTimer?.Start();
-    }
-
-    protected override void OnDetachedCore()
-    {
-        if (_isDesignMode) return;
-
-        _refreshTimer?.Stop();
-        _cancellationTokenSource?.Cancel();
-
-        foreach (var bitmap in _coverCache.Values)
-        {
-            bitmap.Dispose();
-        }
-        _coverCache.Clear();
-    }
-
-    protected override void OnAppearanceChangedCore(AirAppAppearanceSnapshot snapshot)
-    {
-        var newIsDarkMode = snapshot.IsDarkMode;
-        if (_isDarkMode != newIsDarkMode)
-        {
-            _isDarkMode = newIsDarkMode;
-            Dispatcher.UIThread.Post(() =>
-            {
-                ApplyTheme();
-                ApplyScale();
-                UpdateSongsPanel();
-            });
-        }
     }
 
     private void SetupDesignTimePreview()
@@ -227,7 +194,7 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
     {
         if (_isDesignMode) return;
 
-        var cornerRadius = 12.0;
+        var cornerRadius = ResolveComponentCornerRadius();
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);
         CardBorder.CornerRadius = new CornerRadius(cornerRadius);
@@ -306,7 +273,24 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
     {
         if (_isDesignMode) return;
 
-        SubscribeToPluginBus();
+        if (_context is not null)
+        {
+            _context.Appearance.Changed -= OnAppearanceChanged;
+            _context.Appearance.Changed += OnAppearanceChanged;
+        }
+
+        if (_settingsService is not null)
+        {
+            _settingsService.SettingsChanged -= OnSettingsChanged;
+            _settingsService.SettingsChanged += OnSettingsChanged;
+        }
+
+        if (_dataService is not null)
+        {
+            _dataService.DataRefreshRequested -= OnDataRefreshRequested;
+            _dataService.DataRefreshRequested += OnDataRefreshRequested;
+        }
+
         _isDarkMode = ResolveIsDarkMode();
         ApplyTheme();
         _ = RefreshAsync();
@@ -320,11 +304,15 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
         _refreshTimer?.Stop();
         _cancellationTokenSource?.Cancel();
 
-        foreach (var subscription in _subscriptions)
+        if (_settingsService is not null)
         {
-            subscription.Dispose();
+            _settingsService.SettingsChanged -= OnSettingsChanged;
         }
-        _subscriptions.Clear();
+
+        if (_dataService is not null)
+        {
+            _dataService.DataRefreshRequested -= OnDataRefreshRequested;
+        }
 
         foreach (var bitmap in _coverCache.Values)
         {
@@ -351,6 +339,11 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
         Dispatcher.UIThread.Post(async () => await RefreshAsync());
     }
 
+    private void OnDataRefreshRequested(object? sender, EventArgs e)
+    {
+        Dispatcher.UIThread.Post(async () => await RefreshAsync());
+    }
+
     private void OnAppearanceChanged(object? sender, AppearanceChangedEvent e)
     {
         if (_context is null) return;
@@ -374,17 +367,6 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
                 UpdateSongsPanel();
             });
         }
-    }
-
-    private void SubscribeToPluginBus()
-    {
-        if (_messageBus is null || _subscriptions.Count > 0)
-        {
-            return;
-        }
-
-        _subscriptions.Add(_messageBus.Subscribe<VoiceHubDataRefreshMessage>(_ =>
-            Dispatcher.UIThread.Post(async () => await RefreshAsync())));
     }
 
     public async Task RefreshAsync()
@@ -560,7 +542,9 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
 
     private Border CreateSongCard(Song song, double titleSize, double detailSize, double basis, VoiceHubSettings? settings = null)
     {
-        var cardCornerRadius = _isDesignMode ? 10d : 14d;
+        var cardCornerRadius = _isDesignMode
+            ? 10d
+            : _context?.ResolveCornerRadius(PluginCornerRadiusPreset.Md) ?? 10d;
 
         var surfaceColor = _isDarkMode ? Color.Parse("#252B33") : Color.Parse("#F8F8F8");
         var textColor = _isDarkMode ? ThemeColors.DarkText : ThemeColors.LightText;
@@ -578,9 +562,9 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
             VerticalAlignment = VerticalAlignment.Center
         };
 
-        var fallbackIcon = new FontIcon
+        var fallbackIcon = new TextBlock
         {
-            Glyph = "",
+            Text = "♪",
             FontSize = coverSize * 0.45,
             Foreground = new SolidColorBrush(_isDarkMode ? ThemeColors.DarkTextSecondary : ThemeColors.LightTextSecondary),
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -633,9 +617,9 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
             IsVisible = song.VoteCount > 0
         };
 
-        var voteIcon = new FontIcon
+        var voteIcon = new TextBlock
         {
-            Glyph = "",
+            Text = "♥",
             FontSize = detailSize * 1.1,
             Foreground = new SolidColorBrush(ThemeColors.Warning),
             VerticalAlignment = VerticalAlignment.Center
@@ -716,8 +700,10 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
     private void ApplyScale()
     {
         var basis = GetLayoutBasis();
-        var cornerRadius = _isDesignMode ? 24d : 24d;
-        var smRadius = _isDesignMode ? 10d : 14d;
+        var cornerRadius = ResolveComponentCornerRadius();
+        var smRadius = _isDesignMode
+            ? 10d
+            : _context?.ResolveCornerRadius(PluginCornerRadiusPreset.Sm) ?? 10d;
 
         RootBorder.CornerRadius = new CornerRadius(cornerRadius);
         CardBackground.CornerRadius = new CornerRadius(cornerRadius);
@@ -764,7 +750,7 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
             return Math.Min(Bounds.Width, Bounds.Height);
         }
 
-        var cellSize = 100.0;
+        var cellSize = _context?.CellSize ?? 100.0;
         var width = Bounds.Width > 1 ? Bounds.Width : cellSize * 3;
         var height = Bounds.Height > 1 ? Bounds.Height : cellSize * 4;
         return Math.Max(cellSize * 3, Math.Min(width, height));
@@ -779,9 +765,14 @@ public partial class VoiceHubPlaylistWidget : AirAppWidgetBase
     {
         return string.Format(fallback, args);
     }
-}
 
-public sealed class VoiceHubDataRefreshMessage;
+    private double ResolveComponentCornerRadius()
+    {
+        return _isDesignMode
+            ? 24d
+            : _context?.ResolveCornerRadius(PluginCornerRadiusPreset.Component) ?? 12d;
+    }
+}
 
 public sealed class VoiceHubDataService
 {

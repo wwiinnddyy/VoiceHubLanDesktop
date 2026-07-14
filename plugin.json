@@ -3,8 +3,11 @@
   "name": "VoiceHub Campus Playlist",
   "description": "Shows the VoiceHub public playlist in LanMountainDesktop.",
   "author": "LaoShui",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "apiVersion": "5.0.0",
   "entranceAssembly": "VoiceHubLanDesktop.dll",
-  "sharedContracts": []
+  "sharedContracts": [],
+  "runtime": {
+    "mode": "in-proc"
+  }
 }
