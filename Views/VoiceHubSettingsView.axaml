@@ -1,17 +1,17 @@
-<lm:SettingsPageBase xmlns="https://github.com/avaloniaui"
+<lm:AirAppSettingsPageBase xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:vm="using:VoiceHubLanDesktop.ViewModels"
-             xmlns:lm="using:LanMountainDesktop.PluginSdk"
+             xmlns:lm="using:LanMountainDesktop.AirAppSdk"
              mc:Ignorable="d"
              d:DesignWidth="600"
              d:DesignHeight="500"
              x:Class="VoiceHubLanDesktop.Views.VoiceHubSettingsView"
              x:DataType="vm:VoiceHubSettingsViewModel">
 
-    <lm:SettingsPageBase.Styles>
+    <lm:AirAppSettingsPageBase.Styles>
         <!-- Section Card Style -->
         <Style Selector="Border.settings-section">
             <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
@@ -156,7 +156,7 @@
         <Style Selector="Border.status-badge.error TextBlock.status-text">
             <Setter Property="Foreground" Value="{DynamicResource ErrorForegroundBrush}" />
         </Style>
-    </lm:SettingsPageBase.Styles>
+    </lm:AirAppSettingsPageBase.Styles>
 
     <ScrollViewer Background="Transparent"
                   HorizontalScrollBarVisibility="Disabled"
@@ -352,4 +352,4 @@
 
         </StackPanel>
     </ScrollViewer>
-</lm:SettingsPageBase>
+</lm:AirAppSettingsPageBase>
