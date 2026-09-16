@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  PROJECT: VoiceHubLanDesktop.csproj
+
+jobs:
+  build:
+    name: Build and package .laapp
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-quality: 'preview'
+
+      # AirApp SDK 发布在 GitHub Packages，读取也需要认证。
+      # 仓库需要配置一个带 read:packages 权限的 PAT 作为 LANMOUNTAIN_PACKAGES_TOKEN。
+      - name: Add LanMountain package source
+        run: >
+          dotnet nuget add source https://nuget.pkg.github.com/wwiinnddyy/index.json
+          --name lanmountain
+          --username ${{ github.actor }}
+          --password ${{ secrets.LANMOUNTAIN_PACKAGES_TOKEN }}
+          --store-password-in-clear-text
+
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT }}
+
+      # 构建即打包：AirApp SDK 的 MSBuild target 产出 .laapp。
+      - name: Build and package
+        run: dotnet build ${{ env.PROJECT }} -c Release --no-restore
+
+      - name: Upload .laapp
+        uses: actions/upload-artifact@v7
+        with:
+          name: voicehub-airapp
+          path: '*.laapp'
+          if-no-files-found: error
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: '*.laapp'
+          generate_release_notes: true

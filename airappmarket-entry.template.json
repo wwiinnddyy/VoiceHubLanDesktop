@@ -1,10 +1,9 @@
 {
-  "id": "VoiceHubLanDesktop",
+  "id": "com.voicehub.landesktop",
   "name": "VoiceHub Campus Playlist",
   "description": "Shows the VoiceHub public playlist in LanMountainDesktop.",
   "author": "LaoShui",
-  "apiVersion": "5.0.0",
-  "minHostVersion": "0.8.6",
+  "minHostVersion": "0.9.1",
   "iconUrl": "https://raw.githubusercontent.com/wwiinnddyy/VoiceHubLanDesktop/main/Assets/icon.png",
   "projectUrl": "https://github.com/wwiinnddyy/VoiceHubLanDesktop",
   "readmeUrl": "https://raw.githubusercontent.com/wwiinnddyy/VoiceHubLanDesktop/main/README.md",
@@ -16,5 +15,5 @@
     "playlist",
     "radio"
   ],
-  "releaseNotes": "Production PluginSdk v5 release with host-managed settings, appearance-aware corner radii, and market manifest v2 packaging."
+  "releaseNotes": "AirApp SDK 1.0.0 release with host-managed settings and appearance-aware corner radii."
 }

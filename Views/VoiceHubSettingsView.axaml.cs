@@ -4,13 +4,14 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Styling;
+using FluentAvalonia.UI.Controls;
 using FluentIcons.Avalonia;
-using LanMountainDesktop.PluginSdk;
+using LanMountainDesktop.AirAppSdk;
 using VoiceHubLanDesktop.ViewModels;
 
 namespace VoiceHubLanDesktop.Views;
 
-public partial class VoiceHubSettingsView : SettingsPageBase
+public partial class VoiceHubSettingsView : AirAppSettingsPageBase
 {
     private VoiceHubSettingsViewModel? _viewModel;
     private bool _isDarkMode;
@@ -72,11 +73,6 @@ public partial class VoiceHubSettingsView : SettingsPageBase
 
         DataContextChanged += OnDataContextChanged;
         ActualThemeVariantChanged += OnThemeVariantChanged;
-    }
-
-    public VoiceHubSettingsView(VoiceHubSettingsViewModel viewModel) : this()
-    {
-        DataContext = viewModel;
     }
 
     public override void OnNavigatedTo(object? parameter)

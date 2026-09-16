@@ -21,7 +21,6 @@
 # Workflow-generated release metadata
 /artifacts/*
 *.laapp
-!VoiceHubLanDesktop.1.0.0.laapp
 
 # Local NuGet packages
 /packages/*

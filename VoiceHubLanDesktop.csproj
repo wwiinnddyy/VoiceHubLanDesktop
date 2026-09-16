@@ -6,28 +6,14 @@
     <Version>1.0.0</Version>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <OutputPath>bin\$(Configuration)\$(TargetFramework)\content\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <LanMountainPluginBuildOutputDirectory>$(OutputPath)</LanMountainPluginBuildOutputDirectory>
-    <LanMountainPluginPackageVersion>$(Version)</LanMountainPluginPackageVersion>
-    <LanMountainPluginPackageOutputDirectory>$(MSBuildThisFileDirectory)</LanMountainPluginPackageOutputDirectory>
-    <LanMountainPluginPackageFileName>VoiceHubLanDesktop.$(LanMountainPluginPackageVersion)$(LanMountainPluginPackageExtension)</LanMountainPluginPackageFileName>
-    <LanMountainPluginPackagePath>$(LanMountainPluginPackageOutputDirectory)$(LanMountainPluginPackageFileName)</LanMountainPluginPackagePath>
-    <RestorePackagesPath>$(MSBuildProjectDirectory)\.nuget\packages</RestorePackagesPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LanMountainDesktop.PluginSdk" Version="5.0.0" ExcludeAssets="runtime;native" PrivateAssets="all" />
-    <None Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Avalonia / FluentAvalonia 由 AirAppSdk 传递，显式钉版本会导致加载期类型冲突。 -->
+    <PackageReference Include="LanMountainDesktop.AirAppSdk" Version="1.0.0" ExcludeAssets="runtime;native" PrivateAssets="all" />
+    <None Include="airapp.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Localization\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
-  <Target Name="CleanPluginOutputBeforeBuild"
-          BeforeTargets="PrepareForBuild"
-          Condition="'$(DesignTimeBuild)' != 'true'">
-    <RemoveDir Directories="$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)\content" />
-  </Target>
 
 </Project>

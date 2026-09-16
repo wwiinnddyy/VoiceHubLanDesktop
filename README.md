@@ -36,22 +36,19 @@ Download the latest `.laapp` from [Releases](https://github.com/wwiinnddyy/Voice
 ### Requirements
 
 - .NET 10.0 SDK
-- LanMountainDesktop.PluginSdk 5.0.0 (first supported by LanMountainDesktop 0.8.6)
-- Restore uses an isolated `.nuget/packages` cache to prevent stale SDK 5.0.0 content from the machine-wide NuGet cache.
+- LanMountainDesktop.AirAppSdk 1.0.0, published on GitHub Packages. Add the source once with a PAT that has `read:packages`:
+
+  ```powershell
+  dotnet nuget add source https://nuget.pkg.github.com/wwiinnddyy/index.json --name lanmountain --username <your-github-username> --password <PAT> --store-password-in-clear-text
+  ```
 
 ### Local build
 
 ```powershell
-# Initialize the local feed, restore, build, package, and validate
-.\scripts\build-local.ps1 -LanMountainDesktopPath ..\LanMountainDesktop
+dotnet build VoiceHubLanDesktop.csproj -c Release
 ```
 
-### Validation
-
-```powershell
-# Validate plugin consistency
-.\scripts\Test-PluginConsistency.ps1
-```
+The AirApp SDK's MSBuild target packages the build output into `VoiceHubLanDesktop.<version>.laapp` automatically.
 
 ## Configuration
 
@@ -70,8 +67,8 @@ Find the "VoiceHub settings" page in LanMountainDesktop:
 VoiceHubLanDesktop/
 ├── .github/
 │   └── workflows/
-│       ├── voicehub-plugin-ci.yml
-│       └── voicehub-plugin-release.yml
+│       ├── ci.yml
+│       └── release.yml
 ├── Localization/
 │   ├── zh-CN.json
 │   └── en-US.json
@@ -81,16 +78,10 @@ VoiceHubLanDesktop/
 │   └── VoiceHubSettingsService.cs
 ├── Widgets/
 │   └── VoiceHubPlaylistWidget.cs
-├── scripts/
-│   ├── Initialize-LocalPackageFeed.ps1
-│   ├── New-MarketManifest.ps1
-│   ├── New-ReleaseNotes.ps1
-│   ├── Set-PluginVersion.ps1
-│   └── Test-PluginConsistency.ps1
 ├── airappmarket-entry.template.json
 ├── NuGet.config
 ├── Plugin.cs
-├── plugin.json
+├── airapp.json
 └── VoiceHubLanDesktop.csproj
 ```
 

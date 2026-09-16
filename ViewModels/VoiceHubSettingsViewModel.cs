@@ -6,9 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using FluentIcons.Common;
-using LanMountainDesktop.PluginSdk;
+using LanMountainDesktop.AirAppSdk;
 using VoiceHubLanDesktop.Services;
-using VoiceHubLanDesktop.Widgets;
 
 namespace VoiceHubLanDesktop.ViewModels;
 
@@ -16,8 +15,7 @@ public sealed class VoiceHubSettingsViewModel : INotifyPropertyChanged
 {
     private readonly VoiceHubSettingsService _settingsService;
     private readonly HttpClient _httpClient;
-    private readonly PluginLocalizer? _localizer;
-    private readonly VoiceHubDataService _dataService;
+    private readonly AirAppLocalizer? _localizer;
 
     // Original values for reset functionality
     private string _originalApiUrl = string.Empty;
@@ -40,11 +38,9 @@ public sealed class VoiceHubSettingsViewModel : INotifyPropertyChanged
 
     public VoiceHubSettingsViewModel(
         VoiceHubSettingsService settingsService,
-        VoiceHubDataService dataService,
-        PluginLocalizer? localizer = null)
+        AirAppLocalizer? localizer = null)
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
-        _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
         _localizer = localizer;
         _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
 
@@ -240,7 +236,6 @@ public sealed class VoiceHubSettingsViewModel : INotifyPropertyChanged
         });
 
         SaveOriginalValues();
-        _dataService.RequestRefresh();
     }
 
     public void ResetToOriginal()
