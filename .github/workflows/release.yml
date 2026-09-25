@@ -8,13 +8,15 @@ on:
 
 permissions:
   contents: write
+  packages: read
 
 env:
   DOTNET_VERSION: '10.0.x'
   PROJECT: VoiceHubLanDesktop.csproj
-  # NuGet.config 里的 lanmountain 源用这两个环境变量取凭据（源地址与凭据槽只在 NuGet.config 说一次）。
+  # lanmountain 源的凭据槽（NuGet.config 用 %VAR% 取用）。实测工作流自带的 GITHUB_TOKEN 就读得到公开包：
+  # 同一 job 里假 token 报 NU1301/401，换成 GITHUB_TOKEN 就还原成功——不需要再配 PAT 或仓库 secret。
   LANMOUNTAIN_PACKAGES_USER: ${{ github.actor }}
-  LANMOUNTAIN_PACKAGES_TOKEN: ${{ secrets.LANMOUNTAIN_PACKAGES_TOKEN }}
+  LANMOUNTAIN_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
@@ -30,19 +32,6 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           dotnet-quality: 'preview'
-
-      # NuGet.config 用 %LANMOUNTAIN_PACKAGES_TOKEN% 取凭据：变量没设时那一格被替换成空串，
-      # 还原层报的是 "Value cannot be null or empty string. (Parameter 'password')"，
-      # 看不出真正缺的是什么。这里先翻译成人话。
-      - name: Require the packages credential
-        shell: bash
-        env:
-          TOKEN: ${{ secrets.LANMOUNTAIN_PACKAGES_TOKEN }}
-        run: |
-          if [ -z "$TOKEN" ]; then
-            echo "::error::仓库还没配置 LANMOUNTAIN_PACKAGES_TOKEN（一张带 read:packages 权限的 PAT）。位置：Settings → Secrets and variables → Actions → New repository secret。"
-            exit 1
-          fi
 
       - name: Restore
         run: dotnet restore ${{ env.PROJECT }}
