@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <!-- Avalonia / FluentAvalonia 由 AirAppSdk 传递，显式钉版本会导致加载期类型冲突。 -->
-    <PackageReference Include="LanMountainDesktop.AirAppSdk" Version="1.0.0" ExcludeAssets="runtime;native" PrivateAssets="all" />
+    <PackageReference Include="LanMountainDesktop.AirAppSdk" Version="1.0.1" ExcludeAssets="runtime;native" PrivateAssets="all" />
     <None Include="airapp.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Localization\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
